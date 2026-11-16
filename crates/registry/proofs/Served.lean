@@ -26,10 +26,10 @@ patch's dependency rows are stored ascending (`DepsAscending`; the native
 tested for existence, so `pg_served` holds in every reachable state with
 ascending dependency lists.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Narrow o5s_registry.Writes
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Narrow o1s_registry.Writes
   H5iAppLib
 
-namespace o5s_registry.Served
+namespace o1s_registry.Served
 
 -- Row equality, which `rows_where`'s duplicate check needs.
 deriving instance DecidableEq for PatchRow, Dependency, Approval, CheckReport, Channel, Member, PathKind,
@@ -936,4 +936,4 @@ theorem pg_served (a : Principal) (s p : Snapshot) (c : Command)
   rw [Refine.transition_refines _ _ _ _ h, loaded]
   exact pg_model a c _ (Invariant.reachable_inv reach) (ordered_of_reachable reach deps)
 
-end o5s_registry.Served
+end o1s_registry.Served

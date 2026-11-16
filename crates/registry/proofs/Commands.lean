@@ -6,9 +6,9 @@ One lemma per kernel command: if the extracted function returns `Ok`, its
 write set is exactly the listed writes, and the facts the command checked
 hold of the rows it read. `Theorems.lean` uses only these lemmas.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Schema o5s_registry.Helpers H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Schema o1s_registry.Helpers H5iAppLib
 
-namespace o5s_registry.Commands
+namespace o1s_registry.Commands
 
 attribute [simp] H5iAppLib.u64_val_eq
 
@@ -97,4 +97,4 @@ theorem check_spec (u : U64) (s : Snapshot) (patch : U64) (passed : Bool) :
   refine ⟨p, List.mem_of_find?_eq_some hp, by simpa using List.find?_some hp, ‹_›, r, r_post, ?_⟩
   simp [ws2_post, ws1_post, ws_post, x_post, hir]
 
-end o5s_registry.Commands
+end o1s_registry.Commands

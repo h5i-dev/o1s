@@ -1,7 +1,7 @@
 import Lake
 open Lake DSL
 
--- Pinned to the Aeneas commit that generated generated/O5sKernel.lean.
+-- Pinned to the Aeneas commit that generated generated/O1sKernel.lean.
 require aeneas from git
   "https://github.com/AeneasVerif/aeneas" @ "b86120db3183b0107eb5f2637b11c424cd06ef1c" / "backends/lean"
 
@@ -9,12 +9,12 @@ require aeneas from git
 require h5i_app_lib from git
   "https://github.com/h5i-dev/h5i" @ "v0.5.0" / "crates/h5i-app-core/proofs"
 
-package o5s_proofs
+package o1s_proofs
 
 -- Generated Lean: the extracted Rust (`h5i app extract`). Do not edit.
 lean_lib Generated where
   srcDir := "generated"
-  roots := #[`O5sKernel, `StdSpecs]
+  roots := #[`O1sKernel, `StdSpecs]
 
 -- Hand-written spec and proofs.
 @[default_target] lean_lib Proofs where

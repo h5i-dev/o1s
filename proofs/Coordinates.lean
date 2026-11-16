@@ -1,6 +1,6 @@
 import Indexed
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Coordinates
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Coordinates
 open Indexed
 
 def abstract (s : coordinates.Scan) : List Nat × Nat := (s.offsets.val.map (·.val), s.position.val)
@@ -131,4 +131,4 @@ theorem model_ordered (bytes : List U8) : (model bytes).Pairwise (· < ·) := by
   rw [← h.1] at sorted
   simpa only [List.pairwise_map] using sorted
 
-end o5s_kernel.Coordinates
+end o1s_kernel.Coordinates

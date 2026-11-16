@@ -20,7 +20,7 @@ use axum::{
     routing::{get, post},
 };
 use h5i_app_json::Value;
-use o5s_platform::{Actor, Command, IncrementalView, Refusal, Repository};
+use o1s_platform::{Actor, Command, IncrementalView, Refusal, Repository};
 use serde::Deserialize;
 use std::{
     collections::BTreeMap,
@@ -42,7 +42,7 @@ pub struct AppState {
     /// Print one JSON line per request to stderr.
     pub log_requests: bool,
     pub revocations: Arc<revocation::Store>,
-    pub rate: Arc<o5s_platform::limits::RateLimiter>,
+    pub rate: Arc<o1s_platform::limits::RateLimiter>,
 }
 
 impl AppState {
@@ -194,14 +194,14 @@ async fn revoke_token(State(s): State<AppState>, headers: HeaderMap, bytes: Byte
         }
     };
     let r = if q.all {
-        o5s_pgwire::revoke::Revocation::User {
+        o1s_pgwire::revoke::Revocation::User {
             tenant,
             user,
             not_after: exp,
         }
     } else {
-        o5s_pgwire::revoke::Revocation::Token {
-            digest: o5s_pgwire::revoke::digest(&token),
+        o1s_pgwire::revoke::Revocation::Token {
+            digest: o1s_pgwire::revoke::digest(&token),
             expires: exp,
         }
     };
@@ -278,7 +278,7 @@ async fn command(State(s): State<AppState>, headers: HeaderMap, body: Bytes) -> 
     reply(s.backend.execute(a, c, key).await)
 }
 
-/// The operator's rate limit and repository quota (`o5s_platform::limits`).
+/// The operator's rate limit and repository quota (`o1s_platform::limits`).
 async fn admit(s: &AppState, a: &Actor, c: &Command) -> Result<(), Response> {
     let now = h5i_app_core::Timestamp::now().micros() / 1000;
     if !s.rate.allow(a, now) {
@@ -287,10 +287,10 @@ async fn admit(s: &AppState, a: &Actor, c: &Command) -> Result<(), Response> {
             serde_json::json!({"error":"too many commands; retry later"}),
         ));
     }
-    if matches!(c, Command::Create { .. }) && o5s_platform::limits::get().max_repositories.is_some()
+    if matches!(c, Command::Create { .. }) && o1s_platform::limits::get().max_repositories.is_some()
     {
         let count = s.backend.repositories(a).await.map_err(failure)?.len();
-        o5s_platform::limits::check_repositories(count)
+        o1s_platform::limits::check_repositories(count)
             .map_err(|e| failure(Failure::Refused(e)))?;
     }
     Ok(())
@@ -337,9 +337,9 @@ fn cached_view(
     name: &str,
     channel: &str,
     repo: &Repository,
-) -> Result<o5s_platform::View, Refusal> {
+) -> Result<o1s_platform::View, Refusal> {
     let key = (
-        o5s_platform::repository_key(a.tenant, name),
+        o1s_platform::repository_key(a.tenant, name),
         channel.to_string(),
     );
     let mut views = views.lock().unwrap();
@@ -363,7 +363,7 @@ where
 {
     let views = s.views.clone();
     let key = (
-        o5s_platform::repository_key(a.tenant, name),
+        o1s_platform::repository_key(a.tenant, name),
         channel.to_string(),
     );
     match tokio::task::spawn_blocking(move || {
@@ -437,7 +437,7 @@ async fn patch_snapshot(
     blocking(
         move || {
             let view = repo.materialize_patch(q.patch)?;
-            Ok(o5s_platform::snapshot_json(&repo, q.patch, &view))
+            Ok(o1s_platform::snapshot_json(&repo, q.patch, &view))
         },
         "snapshot",
     )
@@ -575,7 +575,7 @@ async fn document_view(
         Err(e) => return e,
     };
     blocking(move || {
-        if !o5s_platform::valid_path(&q.path) { return Err(Refusal("invalid document path".into())); }
+        if !o1s_platform::valid_path(&q.path) { return Err(Refusal("invalid document path".into())); }
         let selected: Vec<u64> = match q.patches {
             Some(value) if value.is_empty() => Vec::new(),
             Some(value) => {

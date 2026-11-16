@@ -1,6 +1,6 @@
-import O5sKernel
+import O1sKernel
 import DocModel
-open Aeneas Aeneas.Std Result o5s_kernel
+open Aeneas Aeneas.Std Result o1s_kernel
 /-!
 # The extracted document kernel refines the model (M2–M4, statements to prove)
 
@@ -20,7 +20,7 @@ Main statements:
   different orders materialize the same view (T3.5); it follows from
   `materialize_refines` and the model's `view_perm` and `view_unique`.
 -/
-namespace o5s_kernel.Document
+namespace o1s_kernel.Document
 open DocModel
 
 /-- The kernel's "none" index. -/
@@ -170,4 +170,4 @@ def RoomM (d : document.Doc) : Prop :=
 
 -- `materialize_refines` (T2.0) and `extracted_view_converges` (T3.5) are in `DocMatRefine.lean`.
 
-end o5s_kernel.Document
+end o1s_kernel.Document

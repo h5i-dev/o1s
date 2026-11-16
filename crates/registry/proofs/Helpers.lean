@@ -6,9 +6,9 @@ import StdSpecs
 One spec per helper of `crates/registry/src/lib.rs`, each a total
 correctness statement about the extracted function.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Schema H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Schema H5iAppLib
 
-namespace o5s_registry.Helpers
+namespace o1s_registry.Helpers
 
 attribute [simp] H5iAppLib.u64_val_eq
 
@@ -136,9 +136,9 @@ attribute [simp] H5iAppLib.u64_val_eq
         simp [hany]
     · simp only [SearchStep, WP.spec_ok]; right; exact ⟨by scalar_tac, by simp⟩
 
-end o5s_registry.Helpers
+end o1s_registry.Helpers
 
-namespace o5s_registry.Helpers
+namespace o1s_registry.Helpers
 
 @[step] theorem name_byte_spec (c : U8) : name_byte c ⦃ _ => True ⦄ := by
   unfold name_byte
@@ -224,4 +224,4 @@ def ascending (l : List U64) : Prop := ∀ k (h : k + 1 < l.length), l[k].val < 
       · have : ids.val.length ≠ 0 := by intro h; apply h0; scalar_tac
         simp; omega
 
-end o5s_registry.Helpers
+end o1s_registry.Helpers

@@ -1,6 +1,6 @@
 import Interval
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Splice
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Splice
 
 def replace (bytes : List U8) (start finish : Nat) (replacement : List U8) : List U8 :=
   bytes.take start ++ replacement ++ bytes.drop finish
@@ -72,4 +72,4 @@ theorem extracted_disjoint_commutes
   rw [hl, hr, hx, hy, snapshot, ha0, ha1, hb0, hb1, hs0, hs1]
   exact disjoint_blocks_commute pre oldA gap oldB tail a.val b.val
 
-end o5s_kernel.Splice
+end o1s_kernel.Splice

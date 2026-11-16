@@ -1,5 +1,5 @@
 import Indexed
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Causal searches (M5)
 
@@ -8,7 +8,7 @@ the nearest file heads (`documents::nearest`); `causality::sole_head` is the
 check `prepare_lines` makes before accepting line ranges against a base. Row
 `v` lists the dependencies of patch `v`.
 -/
-namespace o5s_kernel.Causality
+namespace o1s_kernel.Causality
 open Indexed
 
 abbrev Rows := alloc.vec.Vec (alloc.vec.Vec Usize)
@@ -461,4 +461,4 @@ theorem okStep_fold (base : Usize) (A N : List Usize) (b : Bool) :
       have := all_of_clean ancestors_post3 (by rw [ancestors_post2]; exact room) true ht
       cases this
 
-end o5s_kernel.Causality
+end o1s_kernel.Causality

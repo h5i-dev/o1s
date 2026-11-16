@@ -1,7 +1,7 @@
 //! Revoked tokens: refused before any handler runs. The local backend keeps
-//! them in `revocations.json` next to its log, which `o5s-server revoke`
+//! them in `revocations.json` next to its log, which `o1s-server revoke`
 //! rewrites while the server runs; PostgreSQL keeps them in two tables
-//! shared by every replica and the Worker (`o5s_pgwire::revoke`).
+//! shared by every replica and the Worker (`o1s_pgwire::revoke`).
 use crate::{AppState, backend::Failure, pg::PgBackend};
 use axum::{
     extract::{Request, State},
@@ -9,7 +9,7 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use o5s_pgwire::revoke::{Revocation, Revocations, digest};
+use o1s_pgwire::revoke::{Revocation, Revocations, digest};
 use std::{
     collections::HashMap,
     path::PathBuf,

@@ -1,7 +1,7 @@
 import Constructor
 
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Tags
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Tags
 
 def restoredTag (restored : List Bool) (tag : Usize) : Bool :=
   restored[tag.val]?.getD false
@@ -83,4 +83,4 @@ theorem restore_other_cannot_revive (covering : alloc.vec.Vec Usize)
   apply active_tag_hides covering after bounds other covers
   rw [only_changed other distinct, active]
 
-end o5s_kernel.Tags
+end o1s_kernel.Tags

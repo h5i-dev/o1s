@@ -1,4 +1,4 @@
-use o5s_platform::{Edit, IncrementalView, Patch, Repository, projection::Projection};
+use o1s_platform::{Edit, IncrementalView, Patch, Repository, projection::Projection};
 use std::{collections::BTreeSet, time::Instant};
 
 fn append(repo: &mut Repository, id: u64, dependencies: Vec<u64>) {
@@ -84,7 +84,7 @@ fn main() {
     let start = Instant::now();
     let mut visited = 0;
     for _ in 0..10_000 {
-        let search = o5s_kernel::indexed::reachable(&rows, &seeds, marks);
+        let search = o1s_kernel::indexed::reachable(&rows, &seeds, marks);
         assert_eq!(search.marks.as_ptr(), allocation);
         visited += search.queue.len();
         marks = search.marks;

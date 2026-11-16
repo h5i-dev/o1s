@@ -1,18 +1,18 @@
 //! Latency of single uncontended registry transactions on PostgreSQL.
-//! `O5S_DATABASE_URL=... cargo run --release -p o5s-server --example pg_latency -- 500`
-use o5s_platform::{Actor, Command};
+//! `O1S_DATABASE_URL=... cargo run --release -p o1s-server --example pg_latency -- 500`
+use o1s_platform::{Actor, Command};
 use serde_json::json;
 use std::time::Instant;
 
 #[tokio::main]
 async fn main() {
-    let url = std::env::var("O5S_DATABASE_URL").expect("O5S_DATABASE_URL");
+    let url = std::env::var("O1S_DATABASE_URL").expect("O1S_DATABASE_URL");
     let n: u64 = std::env::args()
         .nth(1)
         .and_then(|a| a.parse().ok())
         .unwrap_or(500);
-    let schema = format!("o5s_latency_{}", std::process::id());
-    let pg = o5s_server::pg::connect(&url, &schema, 4).await.unwrap();
+    let schema = format!("o1s_latency_{}", std::process::id());
+    let pg = o1s_server::pg::connect(&url, &schema, 4).await.unwrap();
     let a = |user| Actor { tenant: 1, user };
     let cmd = |v| serde_json::from_value::<Command>(v).unwrap();
     pg.execute(&a(1), cmd(json!({"cmd":"create","repo":"r"})), None)
@@ -47,8 +47,8 @@ async fn main() {
     for _ in 0..n {
         pg.engine
             .snapshot(
-                o5s_platform::repository_key(1, "r"),
-                &o5s_registry::Command::Probe,
+                o1s_platform::repository_key(1, "r"),
+                &o1s_registry::Command::Probe,
             )
             .await
             .unwrap();

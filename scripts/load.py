@@ -134,9 +134,9 @@ def service(args):
         raise Failure('--local-server cannot be combined with --url or --tokens')
     exe = pathlib.Path(args.local_server).resolve()
     if not exe.is_file():
-        raise Failure('server binary not found; build o5s-server first')
+        raise Failure('server binary not found; build o1s-server first')
     binary_sha256 = hashlib.sha256(exe.read_bytes()).hexdigest()
-    temporary = tempfile.TemporaryDirectory(prefix='o5s-load-') if not args.data else None
+    temporary = tempfile.TemporaryDirectory(prefix='o1s-load-') if not args.data else None
     data = pathlib.Path(args.data if args.data else temporary.name)
     data.mkdir(parents=True, exist_ok=True)
     # Fresh run secret is retained only in memory and the child environment.
@@ -145,7 +145,7 @@ def service(args):
         listener.bind(('127.0.0.1', 0))
         port = listener.getsockname()[1]
     origin = f'http://127.0.0.1:{port}'
-    env = dict(os.environ, H5I_APP_SECRET=secret, O5S_DATA=str(data), O5S_BIND=f'127.0.0.1:{port}')
+    env = dict(os.environ, H5I_APP_SECRET=secret, O1S_DATA=str(data), O1S_BIND=f'127.0.0.1:{port}')
     def start():
         return subprocess.Popen([str(exe)], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     child = start()

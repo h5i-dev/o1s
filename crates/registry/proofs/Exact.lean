@@ -5,9 +5,9 @@ import Helpers
 `Helpers.lean` gives one-directional facts about the validators; the model in
 `Model.lean` needs their exact results.
 -/
-open Aeneas Aeneas.Std Result o5s_registry H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry H5iAppLib
 
-namespace o5s_registry.Exact
+namespace o1s_registry.Exact
 
 /-- `name_byte`, branch for branch. -/
 def nameByte (c : U8) : Bool :=
@@ -138,4 +138,4 @@ theorem valid_batch_exact (ids : alloc.vec.Vec U64) : valid_batch ids ⦃ b => b
       · exact ⟨by simp, fun k hk => by simp at hk⟩
       · have := hlen.1; simp; omega
 
-end o5s_registry.Exact
+end o1s_registry.Exact

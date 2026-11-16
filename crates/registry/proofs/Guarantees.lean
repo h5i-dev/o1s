@@ -6,9 +6,9 @@ Each theorem is about the extracted `transition`: `Refine.transition_refines`
 turns a successful run into a fact about `Model.step`, and the proofs reason
 about the model.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec H5iAppLib
 
-namespace o5s_registry.Guarantees
+namespace o1s_registry.Guarantees
 
 /-- `transition` succeeds with writes `ws`. -/
 def Succeeds (a : Principal) (s : Snapshot) (c : Command) (ws : alloc.vec.Vec Write) : Prop :=
@@ -214,4 +214,4 @@ theorem frame (a : Principal) (s : Snapshot) (c : Command) (e : alloc.vec.Vec Ev
   rw [Refine.transition_refines _ _ _ _ h]
   exact frame_model a (Snapshot.toSt s) c e.val b.val l.val hc
 
-end o5s_registry.Guarantees
+end o1s_registry.Guarantees

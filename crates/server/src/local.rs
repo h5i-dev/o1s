@@ -5,7 +5,7 @@
 //! crash is truncated; corruption anywhere else refuses to start.
 use crate::backend::Failure;
 use fs2::FileExt;
-use o5s_platform::{Actor, Command, Database, Effect, Refusal};
+use o1s_platform::{Actor, Command, Database, Effect, Refusal};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
@@ -77,7 +77,7 @@ impl Store {
         let created = !path.exists();
         if created && root.join("state.json").exists() {
             return Err(format!(
-                "{} holds a pre-kernel state.json; import it with `o5s-server import-json {}` first",
+                "{} holds a pre-kernel state.json; import it with `o1s-server import-json {}` first",
                 root.display(),
                 root.display()
             )

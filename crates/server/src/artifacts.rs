@@ -1,8 +1,8 @@
 //! Local Git objects and detached workspaces. No network commands or remote
 //! push. Export refuses unresolved conflicts and records immutable patch hashes
 //! in the commit message. Cloudflare Artifacts stores the same Git projection.
-use o5s_gitpush as gitpush;
-use o5s_platform::{Kind, Mode, Refusal, Repository, View, valid_name, workspace};
+use o1s_gitpush as gitpush;
+use o1s_platform::{Kind, Mode, Refusal, Repository, View, valid_name, workspace};
 use std::{
     collections::BTreeMap,
     io::Write,
@@ -14,10 +14,10 @@ fn git(path: &Path, args: &[&str], input: &[u8]) -> Result<String, Refusal> {
         .arg("--git-dir")
         .arg(path)
         .args(args)
-        .env("GIT_AUTHOR_NAME", "o5s")
-        .env("GIT_AUTHOR_EMAIL", "o5s@localhost")
-        .env("GIT_COMMITTER_NAME", "o5s")
-        .env("GIT_COMMITTER_EMAIL", "o5s@localhost")
+        .env("GIT_AUTHOR_NAME", "o1s")
+        .env("GIT_AUTHOR_EMAIL", "o1s@localhost")
+        .env("GIT_COMMITTER_NAME", "o1s")
+        .env("GIT_COMMITTER_EMAIL", "o1s@localhost")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -41,7 +41,7 @@ fn git(path: &Path, args: &[&str], input: &[u8]) -> Result<String, Refusal> {
     Ok(String::from_utf8_lossy(&output.stdout).trim().into())
 }
 /// Write the objects of `files`' tree into the bare repository at `path`
-/// and return the tree id. The objects are built in process (`o5s-gitpush`);
+/// and return the tree id. The objects are built in process (`o1s-gitpush`);
 /// those the repository lacks go in as one pack, so an export costs a few
 /// Git processes however many files and directories it has.
 fn store(path: &Path, files: &BTreeMap<String, gitpush::File>) -> Result<String, Refusal> {
@@ -128,10 +128,10 @@ pub fn export_view(
         .create(true)
         .truncate(false)
         .write(true)
-        .open(path.join("o5s-export.lock"))
+        .open(path.join("o1s-export.lock"))
         .map_err(|e| Refusal(e.to_string()))?;
     fs2::FileExt::lock_exclusive(&lock).map_err(|e| Refusal(e.to_string()))?;
-    let marks = path.join("o5s-generations");
+    let marks = path.join("o1s-generations");
     std::fs::create_dir_all(&marks).map_err(|e| Refusal(e.to_string()))?;
     let mark = marks.join(channel);
     let exported: u64 = std::fs::read_to_string(&mark)
@@ -293,8 +293,8 @@ pub fn workspace_proposal(
     commit: &str,
     intent: &str,
     repo: &Repository,
-) -> Result<o5s_platform::Command, Refusal> {
-    use o5s_platform::valid_path;
+) -> Result<o1s_platform::Command, Refusal> {
+    use o1s_platform::valid_path;
     use std::collections::BTreeSet;
     let refusal = |message: &str| Refusal(message.into());
     if !valid_name(name)
@@ -351,7 +351,7 @@ pub fn workspace_proposal(
     }
     let message = text(run(&["show", "-s", "--format=%B", "HEAD"])?)?;
     if workspace::parse(&message).is_none() {
-        return Err(refusal("workspace is not an o5s projection"));
+        return Err(refusal("workspace is not an o1s projection"));
     }
     // Submodules are gitlinks in the index: mode 160000 and a commit id.
     let mut submodules = BTreeMap::new();

@@ -34,8 +34,8 @@ node_modules/
 # h5i run records
 .h5i/
 
-# Local o5s state, credentials and Git artifact projections
-.o5s/
+# Local o1s state, credentials and Git artifact projections
+.o1s/
 
 # Python demo artifacts
 __pycache__/

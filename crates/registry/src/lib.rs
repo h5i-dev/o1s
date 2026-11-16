@@ -1,11 +1,11 @@
-//! The transactional o5s patch registry.
+//! The transactional o1s patch registry.
 //!
 //! Every registry decision the server commits is made by [`transition`]: the
 //! repository directory, immutable patch registration, independent review and
 //! check facts, channel forks and dependency-closed admission. The kernel is
 //! Rust in the subset Aeneas translates to Lean (no iterators, no `?`, index
 //! loops), and the proofs in `proofs/` are about this code. Admission calls
-//! the proven [`o5s_kernel::patch::merge`].
+//! the proven [`o1s_kernel::patch::merge`].
 //!
 //! Each repository is its own h5i tenant (`Principal::scope`), so the
 //! PostgreSQL engine loads and locks one repository per transaction. Every
@@ -18,7 +18,7 @@
 
 use h5i_app_std::bytes;
 use h5i_app_std::set;
-use o5s_kernel::patch;
+use o1s_kernel::patch;
 
 pub type Text = Vec<u8>;
 
@@ -62,7 +62,7 @@ pub struct Principal {
 }
 
 h5i_app_schema::schema! {
-    mapping registry_tables for o5s_registry, writes Write, lean "proofs/generated/Schema.lean";
+    mapping registry_tables for o1s_registry, writes Write, lean "proofs/generated/Schema.lean";
 
     /// One tenant's rows: either a repository or an organization directory.
     #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -86,7 +86,7 @@ h5i_app_schema::schema! {
     /// tenant reads as zeros: no repository has been created.
     #[derive(Clone, Debug, Default, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Repository in "o5s_repository" {
+    pub struct Repository in "o1s_repository" {
         key {}
         org: u64,
         label: Text,
@@ -100,7 +100,7 @@ h5i_app_schema::schema! {
     /// An immutable patch: its content identity and author.
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct PatchRow in "o5s_patches" {
+    pub struct PatchRow in "o1s_patches" {
         key { id: u64 }
         hash: Text,
         author: u64,
@@ -108,20 +108,20 @@ h5i_app_schema::schema! {
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Dependency in "o5s_dependencies" {
+    pub struct Dependency in "o1s_dependencies" {
         key { patch: u64, dependency: u64 }
     }
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Approval in "o5s_approvals" {
+    pub struct Approval in "o1s_approvals" {
         key { patch: u64, reviewer: u64 }
     }
 
     /// The latest independent check report on a patch.
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct CheckReport in "o5s_checks" {
+    pub struct CheckReport in "o1s_checks" {
         key { patch: u64 }
         passed: bool,
         reporter: u64,
@@ -129,7 +129,7 @@ h5i_app_schema::schema! {
 
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Channel in "o5s_channels" {
+    pub struct Channel in "o1s_channels" {
         key { id: u64 }
         label: Text,
         size: u64,
@@ -138,7 +138,7 @@ h5i_app_schema::schema! {
     /// The patch admitted at `position` of a channel's append-only membership.
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Member in "o5s_members" {
+    pub struct Member in "o1s_members" {
         key { channel: u64, position: u64 }
         patch: u64,
     }
@@ -146,7 +146,7 @@ h5i_app_schema::schema! {
     /// Whether a path holds a graph document or a legacy whole-file/line document.
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct PathKind in "o5s_paths" {
+    pub struct PathKind in "o1s_paths" {
         key { id: u64 }
         path: Text,
         graph: bool,
@@ -154,7 +154,7 @@ h5i_app_schema::schema! {
 
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Event in "o5s_events" {
+    pub struct Event in "o1s_events" {
         key { seq: u64 }
         actor: u64,
         action: u64,
@@ -165,7 +165,7 @@ h5i_app_schema::schema! {
     /// The canonical patch record whose SHA-256 is `PatchRow::hash`.
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Body in "o5s_bodies" {
+    pub struct Body in "o1s_bodies" {
         key { patch: u64 }
         bytes: Text,
     }
@@ -173,7 +173,7 @@ h5i_app_schema::schema! {
     /// A repository name in an organization's directory.
     #[derive(Clone, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Listing in "o5s_listings" {
+    pub struct Listing in "o1s_listings" {
         key { repo: u64 }
         label: Text,
     }
@@ -182,7 +182,7 @@ h5i_app_schema::schema! {
     /// revokes).
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-    pub struct Role in "o5s_roles" {
+    pub struct Role in "o1s_roles" {
         key { user: u64 }
         level: u64,
     }

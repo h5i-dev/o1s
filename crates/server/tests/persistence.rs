@@ -1,5 +1,5 @@
-use o5s_platform::{Actor, Command};
-use o5s_server::{Failure, Store, legacy};
+use o1s_platform::{Actor, Command};
+use o1s_server::{Failure, Store, legacy};
 use serde_json::json;
 use std::io::Write;
 
@@ -219,7 +219,7 @@ fn idempotency_keys_replay_and_reject_reuse() {
 #[test]
 fn legacy_snapshots_import_with_identities_and_membership() {
     let dir = tempfile::tempdir().unwrap();
-    let mut db = o5s_platform::Database::default();
+    let mut db = o1s_platform::Database::default();
     let a = actor(1);
     db.execute(&a, command(json!({"cmd":"create","repo":"alpha"})))
         .unwrap();
@@ -321,11 +321,11 @@ fn live_backups_copy_complete_records_and_restore() {
         .unwrap();
     file.write_all(b"abc").unwrap();
     let out = dir.path().join("backup.log");
-    let summary = o5s_server::local::backup(&dir.path().join("registry.log"), &out).unwrap();
+    let summary = o1s_server::local::backup(&dir.path().join("registry.log"), &out).unwrap();
     assert_eq!(summary.repositories, 2);
     assert_eq!(summary.torn, 0);
     assert_eq!(
-        o5s_server::local::verify(&dir.path().join("registry.log"))
+        o1s_server::local::verify(&dir.path().join("registry.log"))
             .unwrap()
             .torn,
         3

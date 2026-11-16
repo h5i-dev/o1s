@@ -6,9 +6,9 @@ import Spec
 list writes, in order; the repository row becomes the last one written.
 The lemmas about `upsert` folds then answer membership questions.
 -/
-open Aeneas Aeneas.Std o5s_registry o5s_registry.Spec H5iAppLib
+open Aeneas Aeneas.Std o1s_registry o1s_registry.Spec H5iAppLib
 
-namespace o5s_registry.Writes
+namespace o1s_registry.Writes
 
 def patchOf : Write → Option PatchRow | .PutPatch x => some x | _ => none
 def depOf : Write → Option Dependency | .PutDependency x => some x | _ => none
@@ -137,4 +137,4 @@ theorem key_of_mem_puts {xs l : List α} {z : α} (h : z ∈ puts k xs l) : z �
 
 end
 
-end o5s_registry.Writes
+end o1s_registry.Writes

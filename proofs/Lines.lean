@@ -1,7 +1,7 @@
 import Checked
 import Coordinates
 import LinesModel
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The extracted `lines` kernel
 
@@ -9,7 +9,7 @@ Each theorem relates an extracted function in `crates/kernel/src/lines.rs` to
 the model in `LinesModel.lean`, whose order-independence and conflict
 theorems carry over to the extracted code.
 -/
-namespace o5s_kernel.Lines
+namespace o1s_kernel.Lines
 open LinesModel Rendering
 
 abbrev Rg := U64 × U64 × alloc.vec.Vec U8
@@ -675,4 +675,4 @@ theorem merged_renders (original : alloc.vec.Vec U8) (rs : alloc.vec.Vec Rg)
   | none => exact absurd hg hm
   | some _ => rfl
 
-end o5s_kernel.Lines
+end o1s_kernel.Lines

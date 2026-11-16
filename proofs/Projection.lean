@@ -1,9 +1,9 @@
-import O5sKernel
+import O1sKernel
 import StdSpecs
 import H5iAppLib.Graph
 
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Projection
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Projection
 
 /-- An edge or a walk whose internal vertices are dead. Endpoints are
 unrestricted here; the boundary summary restricts both endpoints to live. -/
@@ -92,9 +92,9 @@ theorem incremental_summary {α : Type} (oldEdges newEdges old fresh : List (α 
 
 @[step] theorem reachable_spec (edges : alloc.vec.Vec (U64 × U64)) (start : alloc.vec.Vec U64)
     (room : start.val.length + edges.val.length < Usize.max) :
-    o5s_kernel.graph.reachable edges start
+    o1s_kernel.graph.reachable edges start
       ⦃ out => ∀ v, v ∈ out.val ↔ Reach edges.val start.val v ⦄ := by
-  unfold o5s_kernel.graph.reachable
+  unfold o1s_kernel.graph.reachable
   step*
 
 /-- Both sides execute the extracted Rust search. A correct summary constructor
@@ -106,12 +106,12 @@ theorem extracted_projection (edges summary : alloc.vec.Vec (U64 × U64))
     (roomE : start.val.length + edges.val.length < Usize.max)
     (roomS : start.val.length + summary.val.length < Usize.max)
     (original projected : alloc.vec.Vec U64)
-    (runE : o5s_kernel.graph.reachable edges start = ok original)
-    (runS : o5s_kernel.graph.reachable summary start = ok projected) :
+    (runE : o1s_kernel.graph.reachable edges start = ok original)
+    (runS : o1s_kernel.graph.reachable summary start = ok projected) :
     v ∈ original.val ↔ v ∈ projected.val := by
   have he := post_of_ok (reachable_spec edges start roomE) runE
   have hp := post_of_ok (reachable_spec summary start roomS) runS
   rw [he v, hp v, single]
   exact live_reachability hs hu hv
 
-end o5s_kernel.Projection
+end o1s_kernel.Projection

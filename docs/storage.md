@@ -1,52 +1,52 @@
 # Storage and transactions
 
-Every registry decision the server commits is made by one function, `o5s_registry::transition` in `crates/registry/src/lib.rs`. It is Rust in the subset Charon and Aeneas translate to Lean, and its extraction lives in `crates/registry/proofs/generated/`. The local store and PostgreSQL run that same function; neither contains registry logic of its own.
+Every registry decision the server commits is made by one function, `o1s_registry::transition` in `crates/registry/src/lib.rs`. It is Rust in the subset Charon and Aeneas translate to Lean, and its extraction lives in `crates/registry/proofs/generated/`. The local store and PostgreSQL run that same function; neither contains registry logic of its own.
 
 ## The registry kernel
 
 A command is decided in three steps:
 
 1. **Prepare (native, `crates/platform`).** The server validates the API request and, for proposals, renders line previews and checks graph operations against the proposal's dependencies. It also encodes the canonical patch body, whose SHA-256 is the patch identity. Preparation reads only immutable records named by the proposal, so it may use a cached view.
-2. **Decide (`transition`).** The kernel takes the authenticated principal, the tenant's rows and a kernel command, and either refuses or returns a write set and a reply. It decides repository creation and the directory listing, and it deduplicates content identities and allocates handles. It also enforces graph/legacy path models, independent review and check reports, channel forks, and dependency-closed admission through the proven `o5s_kernel::patch::merge`.
+2. **Decide (`transition`).** The kernel takes the authenticated principal, the tenant's rows and a kernel command, and either refuses or returns a write set and a reply. It decides repository creation and the directory listing, and it deduplicates content identities and allocates handles. It also enforces graph/legacy path models, independent review and check reports, channel forks, and dependency-closed admission through the proven `o1s_kernel::patch::merge`.
 3. **Commit.** The write set is applied atomically: appended to the local log, or written in the PostgreSQL transaction that loaded the rows.
 
 Writes are keyed puts. Nothing is deleted. Patch handles, channel ids, path ids and event sequence numbers come from counters on the repository row, so a new row never overwrites an old one.
 
 | Table | Key | Columns |
 |---|---|---|
-| `o5s_repository` | (one row) | organization, name, created, patch/channel/path/event counters |
-| `o5s_patches` | handle | SHA-256 identity, author |
-| `o5s_dependencies` | patch, dependency | |
-| `o5s_approvals` | patch, reviewer | |
-| `o5s_checks` | patch | passed, reporter (latest report) |
-| `o5s_channels` | id | name, size |
-| `o5s_members` | channel, position | patch (append-only membership) |
-| `o5s_paths` | id | path, graph or legacy model |
-| `o5s_events` | sequence | actor, action, patch, channel |
-| `o5s_bodies` | patch | canonical body bytes |
-| `o5s_listings` | repository key | name (organization directory) |
+| `o1s_repository` | (one row) | organization, name, created, patch/channel/path/event counters |
+| `o1s_patches` | handle | SHA-256 identity, author |
+| `o1s_dependencies` | patch, dependency | |
+| `o1s_approvals` | patch, reviewer | |
+| `o1s_checks` | patch | passed, reporter (latest report) |
+| `o1s_channels` | id | name, size |
+| `o1s_members` | channel, position | patch (append-only membership) |
+| `o1s_paths` | id | path, graph or legacy model |
+| `o1s_events` | sequence | actor, action, patch, channel |
+| `o1s_bodies` | patch | canonical body bytes |
+| `o1s_listings` | repository key | name (organization directory) |
 
 Each repository is its own tenant. Its scope is 2^62 plus 62 bits of SHA-256 over the organization and name, and each organization's directory is the tenant whose scope is the organization id. The kernel refuses a repository command unless the stored organization and name equal the caller's, so a hash collision or a wrong scope is refused rather than exposing another organization's rows. Creating a repository first lists it in the directory and then creates it, so every existing repository is listed. After a crash between the two steps, a listed name may report "repository not found" until creation is retried.
 
 ## Local store
 
-Without `O5S_DATABASE_URL` the server stores `registry.log` in `O5S_DATA`. Each line is `SHA-256 JSON` of one committed decision: the write sets per scope, and the idempotency key and reply if the request had one. A command is decided, appended and `fdatasync`ed, and only then applied in memory. A failed append is truncated back and nothing changes; if truncation also fails, the store refuses writes until restart. Startup replays the log through the kernel's `commit`. An incomplete final record, left by a crash during append, is truncated. A corrupt record anywhere else stops startup. A file lock admits one server per data directory.
+Without `O1S_DATABASE_URL` the server stores `registry.log` in `O1S_DATA`. Each line is `SHA-256 JSON` of one committed decision: the write sets per scope, and the idempotency key and reply if the request had one. A command is decided, appended and `fdatasync`ed, and only then applied in memory. A failed append is truncated back and nothing changes; if truncation also fails, the store refuses writes until restart. Startup replays the log through the kernel's `commit`. An incomplete final record, left by a crash during append, is truncated. A corrupt record anywhere else stops startup. A file lock admits one server per data directory.
 
 ```sh
-o5s-server verify DATA_DIR            # read-only replay and summary
-o5s-server backup DATA_DIR OUT.log    # copy complete records of a live log, then verify the copy
-o5s-server import-json DATA_DIR       # convert a pre-kernel state.json, keeping patch identities
+o1s-server verify DATA_DIR            # read-only replay and summary
+o1s-server backup DATA_DIR OUT.log    # copy complete records of a live log, then verify the copy
+o1s-server import-json DATA_DIR       # convert a pre-kernel state.json, keeping patch identities
 ```
 
 To restore, stop the server and put a verified backup at `DATA_DIR/registry.log`. Git projections and workspaces under `DATA_DIR/artifacts` and `DATA_DIR/workspaces` are derived from the registry and are regenerated by export.
 
 ## PostgreSQL
 
-With `O5S_DATABASE_URL`, commands run through `o5s_pgwire`, which is shared by the native server and the Cloudflare Worker. Each command is one transaction on one tenant scope:
+With `O1S_DATABASE_URL`, commands run through `o1s_pgwire`, which is shared by the native server and the Cloudflare Worker. Each command is one transaction on one tenant scope:
 
 ```text
-BEGIN ISOLATION LEVEL READ COMMITTED; SET LOCAL search_path TO "o5s"; SELECT pg_advisory_xact_lock(scope);
--- idempotency check, narrow load, o5s_registry::transition, pipelined writes
+BEGIN ISOLATION LEVEL READ COMMITTED; SET LOCAL search_path TO "o1s"; SELECT pg_advisory_xact_lock(scope);
+-- idempotency check, narrow load, o1s_registry::transition, pipelined writes
 COMMIT
 ```
 
@@ -62,11 +62,11 @@ BEGIN …; SELECT pg_advisory_xact_lock(scope);
 COMMIT
 ```
 
-Each command still runs the kernel on the rows the earlier ones left, so the order of commands is the lock order as before, and each caller gets its own reply. Within a group, the repository row (the counters every command writes) stays in memory: a command reads its other rows from the database, which holds the earlier commands' other writes, and the row is written once, last. Each command's writes go out in the same flush as the next command's reads, ahead of them. `Group.group_served` proves that the rows a command then runs on are what `load` returns from the state the earlier commands left, and `Group.defer_repo` that writing the repository row last stores that same state. A refused command writes nothing and does not affect the others. If a statement fails, the transaction rolls back and every command in it runs again on its own, with the usual retries. If `COMMIT` fails with an unknown outcome, every command in the group is told so, as for a single command. `O5S_GROUP_COMMIT=0` turns grouping off. The Worker builds an engine per request, so it never groups. Its repository views outlive the request: each isolate keeps up to eight, and a request reuses one as is when a probe shows the repository row and roles unchanged; otherwise it rereads the registry rows but only the bodies of patches committed since.
+Each command still runs the kernel on the rows the earlier ones left, so the order of commands is the lock order as before, and each caller gets its own reply. Within a group, the repository row (the counters every command writes) stays in memory: a command reads its other rows from the database, which holds the earlier commands' other writes, and the row is written once, last. Each command's writes go out in the same flush as the next command's reads, ahead of them. `Group.group_served` proves that the rows a command then runs on are what `load` returns from the state the earlier commands left, and `Group.defer_repo` that writing the repository row last stores that same state. A refused command writes nothing and does not affect the others. If a statement fails, the transaction rolls back and every command in it runs again on its own, with the usual retries. If `COMMIT` fails with an unknown outcome, every command in the group is told so, as for a single command. `O1S_GROUP_COMMIT=0` turns grouping off. The Worker builds an engine per request, so it never groups. Its repository views outlive the request: each isolate keeps up to eight, and a request reuses one as is when a probe shows the repository row and roles unchanged; otherwise it rereads the registry rows but only the bodies of patches committed since.
 
 The transaction-scoped lock orders the commands of a repository (or of an organization's directory). Each later statement reads with a fresh snapshot that includes every earlier holder's commit. A command reads and writes only rows of its own scope, so commands on different scopes share no rows. Every interleaving is therefore equivalent to running commands one at a time in lock order, the model the Lean storage theorems use. The lock ends with the transaction, so it also works behind transaction-mode poolers such as Hyperdrive.
 
-An earlier version ran each command SERIALIZABLE through `h5i_app_pg::Engine`. PostgreSQL's serializable predicate locks cover B-tree index pages shared by many tenants, so unrelated repositories aborted one another. In a 1,000-agent run, 3,570 of 15,598 attempts were retried; with the lock, the same run had none. Disconnects, deadlocks and serialization failures still retry from `BEGIN` (`O5S_DATABASE_ATTEMPTS`, default 64). All SQL on registry tables is planned by `h5i_app_sql` and compiled by the extracted `h5i_app_pgsql`. A test checks that the engine's table definitions equal those `h5i_app_pg` derives from the kernel's `schema!`, so databases created by either are interchangeable. Statements are sent with typed parameters, and writes are pipelined. The native server keeps each statement shape prepared on each of its connections, so PostgreSQL parses and plans it once per connection (`O5S_PREPARED=0` sends every statement unnamed, as the Worker does behind Hyperdrive). A statement not yet prepared runs unnamed in its place in the pipeline and is prepared alongside: waiting for the preparation first would let a pipelined `COMMIT` overtake the command's writes. Tables live in PostgreSQL schema `o5s` (`O5S_DATABASE_SCHEMA`), and `O5S_DATABASE_POOL` (default 16) bounds connections.
+An earlier version ran each command SERIALIZABLE through `h5i_app_pg::Engine`. PostgreSQL's serializable predicate locks cover B-tree index pages shared by many tenants, so unrelated repositories aborted one another. In a 1,000-agent run, 3,570 of 15,598 attempts were retried; with the lock, the same run had none. Disconnects, deadlocks and serialization failures still retry from `BEGIN` (`O1S_DATABASE_ATTEMPTS`, default 64). All SQL on registry tables is planned by `h5i_app_sql` and compiled by the extracted `h5i_app_pgsql`. A test checks that the engine's table definitions equal those `h5i_app_pg` derives from the kernel's `schema!`, so databases created by either are interchangeable. Statements are sent with typed parameters, and writes are pipelined. The native server keeps each statement shape prepared on each of its connections, so PostgreSQL parses and plans it once per connection (`O1S_PREPARED=0` sends every statement unnamed, as the Worker does behind Hyperdrive). A statement not yet prepared runs unnamed in its place in the pipeline and is prepared alongside: waiting for the preparation first would let a pipelined `COMMIT` overtake the command's writes. Tables live in PostgreSQL schema `o1s` (`O1S_DATABASE_SCHEMA`), and `O1S_DATABASE_POOL` (default 16) bounds connections.
 
 `load_for` loads only the rows a command can read. Repository commands never read events, bodies or listings. Approve and check read one patch. A proposal reads the patches with its identity or dependency handles and the paths it names. A merge reads the named channel, its members, and the batch's patches, dependencies, approvals and checks. Above 16 handles it loads whole tables instead. `Narrow.narrow_load` proves that a run on rows agreeing with the whole tenant on each lookup the command makes (the matching rows, in the same relative order) computes what the whole tenant specifies, and `Guarantees.frame` that events, bodies and listings do not matter to repository commands.
 
@@ -74,16 +74,16 @@ Reads use a fresh `REPEATABLE READ READ ONLY` snapshot. A one-row probe compares
 
 Requests may carry `Idempotency-Key` (1–128 visible ASCII characters). The key, a fingerprint of the command and the reply commit with the command's writes. A retry returns the stored reply. The same key with a different command gets HTTP 409. When a commit's outcome is unknown, for example because the connection dropped during `COMMIT`, the server answers 503 and asks for a retry with the same key.
 
-Backups use PostgreSQL's own tools, for example `pg_dump --schema=o5s`. `scripts/postgres.sh` starts a local PostgreSQL 17 container and prints its URL. `scripts/dev.sh --postgres` runs the server against it. The PostgreSQL tests run when `O5S_TEST_DATABASE_URL` is set.
+Backups use PostgreSQL's own tools, for example `pg_dump --schema=o1s`. `scripts/postgres.sh` starts a local PostgreSQL 17 container and prints its URL. `scripts/dev.sh --postgres` runs the server against it. The PostgreSQL tests run when `O1S_TEST_DATABASE_URL` is set.
 
 ## Operations
 
 - `GET /healthz`: the process is up. `GET /readyz`: storage answers (a PostgreSQL transaction succeeds).
 - `GET /metrics`: Prometheus counters and latency histograms by route template and status, plus log size or engine attempts, retries, commits and replays. It carries no tenant data.
-- Every response has `x-request-id` (the client's, or a new one). With `O5S_LOG_REQUESTS` unset or not `0`, each request logs one JSON line on stderr.
+- Every response has `x-request-id` (the client's, or a new one). With `O1S_LOG_REQUESTS` unset or not `0`, each request logs one JSON line on stderr.
 - `H5I_APP_PREVIOUS_SECRETS` (comma-separated) keeps tokens signed by earlier secrets valid during rotation; only `H5I_APP_SECRET` issues tokens.
 - Git export takes a per-repository file lock, moves `refs/heads/<channel>` by compare-and-swap, and records the exported registry generation. A view older than that generation returns the current commit with `"stale": true` and never moves the ref backwards.
 
 ## Upgrading the schema
 
-`o5s-server ddl` prints idempotent `CREATE … IF NOT EXISTS` statements for every table: the registry's (including `o5s_roles` for repository roles), `h5i_idempotency`, the revocation tables `o5s_revoked_users` and `o5s_revoked_tokens` (`docs/access.md`), and `o5s_export_pending`, the Worker's record of Git projections still to deliver. A native server creates them at startup when its role may. For databases reached through a role that cannot run DDL, such as Hyperdrive, pipe the output through `psql` as the owner before deploying a version that adds a table.
+`o1s-server ddl` prints idempotent `CREATE … IF NOT EXISTS` statements for every table: the registry's (including `o1s_roles` for repository roles), `h5i_idempotency`, the revocation tables `o1s_revoked_users` and `o1s_revoked_tokens` (`docs/access.md`), and `o1s_export_pending`, the Worker's record of Git projections still to deliver. A native server creates them at startup when its role may. For databases reached through a role that cannot run DDL, such as Hyperdrive, pipe the output through `psql` as the owner before deploying a version that adds a table.

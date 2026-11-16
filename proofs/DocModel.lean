@@ -23,9 +23,9 @@ The main results:
   totally ordered and no delete/insert conflict is unacknowledged.
 
 Assumption, explicit and unprovable here: patch identities are injective
-(`IdsInjective`), which SHA-256 collision resistance provides in o5s.
+(`IdsInjective`), which SHA-256 collision resistance provides in o1s.
 -/
-namespace o5s_kernel.DocModel
+namespace o1s_kernel.DocModel
 
 abbrev PId := Nat
 
@@ -1848,4 +1848,4 @@ theorem restore_other_cannot_revive (H H' : Hist) (R : Patch) (d d' : OpId) (n :
   · simp at ho
     exact ne ho.2.symm
 
-end o5s_kernel.DocModel
+end o1s_kernel.DocModel

@@ -1,7 +1,7 @@
 //! Persisted graph operations use the same kernel document materializer on all
 //! channel, API and Git export paths. Native envelope validation is not proved.
 use crate::{Alternative, Patch, Refusal, Repository, valid_path};
-use o5s_kernel::model::{DocumentGraph, Operation, PatchId};
+use o1s_kernel::model::{DocumentGraph, Operation, PatchId};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
@@ -190,7 +190,7 @@ impl Docs {
             }
         }
         let roots = initial.iter().map(|h| *h as usize).collect();
-        let found = o5s_kernel::causality::frontier(
+        let found = o1s_kernel::causality::frontier(
             &self.rows,
             &stop,
             &roots,
@@ -342,7 +342,7 @@ pub fn apply_graph_patch(
         .get(patch.id, &edit.path)
         .ok_or_else(|| Refusal("graph document not resolved".into()))?;
     graph
-        .apply(o5s_kernel::model::Patch {
+        .apply(o1s_kernel::model::Patch {
             id: identity(&patch.hash)?,
             dependencies: dependencies(repo, docs, &patch.dependencies, doc)?,
             operations: edit.operations.clone(),
@@ -414,7 +414,7 @@ impl Repository {
             }
             let mut graph = self.document_at(source, deps)?;
             graph
-                .apply(o5s_kernel::model::Patch {
+                .apply(o1s_kernel::model::Patch {
                     id: identity(hash)?,
                     dependencies: dependencies(self, &docs, deps, &doc)?,
                     operations: edit.operations.clone(),

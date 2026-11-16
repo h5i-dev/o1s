@@ -6,8 +6,8 @@
 //! only whether checks last passed, not who reported them; a passing report is
 //! imported with reporter `IMPORTED`. The imported database is projected back
 //! and compared with the legacy repositories before anything is written.
-use o5s_platform::{Database, Effect, Repository, body, repository_key};
-use o5s_registry as kernel;
+use o1s_platform::{Database, Effect, Repository, body, repository_key};
+use o1s_registry as kernel;
 use std::{collections::BTreeMap, path::Path};
 
 /// The reporter recorded for imported passing check reports.
@@ -176,7 +176,7 @@ pub fn convert(json: &[u8]) -> Result<Vec<Effect>, String> {
         }
         let mut listings = Vec::new();
         for (name, repo) in repos {
-            if !o5s_platform::valid_name(name) {
+            if !o1s_platform::valid_name(name) {
                 return Err(format!("invalid repository name {name:?}"));
             }
             let scope = repository_key(*tenant, name);

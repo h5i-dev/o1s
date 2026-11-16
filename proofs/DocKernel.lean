@@ -1,12 +1,12 @@
 import Indexed
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Specifications of the document kernel's helpers
 
 Each theorem gives an extracted helper of `crates/kernel/src/document.rs` a
 list-level meaning; `Document.lean` builds the refinement on them.
 -/
-namespace o5s_kernel.DocKernel
+namespace o1s_kernel.DocKernel
 
 theorem foldl_snoc_const {α β} (x : β) (l : List α) (acc : List β) :
     l.foldl (fun o _ => o ++ [x]) acc = acc ++ List.replicate l.length x := by
@@ -1593,4 +1593,4 @@ theorem foldl_or_any {α} (p : α → Bool) : ∀ (l : List α) (init : Bool),
     all_goals simp_all [FoldStep]
     all_goals scalar_tac
 
-end o5s_kernel.DocKernel
+end o1s_kernel.DocKernel

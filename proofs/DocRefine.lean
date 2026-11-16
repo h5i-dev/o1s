@@ -1,5 +1,5 @@
 import DocCommit
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The extracted document kernel refines the model (validation and commit)
 
@@ -10,7 +10,7 @@ replayed document. `apply_refines` combines the two at the level of
 `applySpec`. The proofs go through the dense encoding `Rep` (`DocRep.lean`)
 and the kernel specifications (`DocKernel.lean`).
 -/
-namespace o5s_kernel.DocRefine
+namespace o1s_kernel.DocRefine
 open DocModel Document DocRep DocKernel
 
 /-! ## The kernel's `validate` -/
@@ -185,4 +185,4 @@ theorem apply_refines (d : document.Doc) (H : Hist) (P : Patch) (dp : document.P
       exact applySpec_error adm.1 adm.2.1 adm.2.2.1 adm.2.2.2.1 adm.2.2.2.2 hval
     · exact absurd (h1.mpr (by rw [hval])) h0
 
-end o5s_kernel.DocRefine
+end o1s_kernel.DocRefine

@@ -3,15 +3,15 @@
 //! keeps workspaces as local worktrees; the Worker keeps them as Artifacts
 //! repositories. Both read the snapshot's patch set from its commit message
 //! and turn changed files into one proposal through this module: graph
-//! operations for text documents, as `o5s propose` sends, and whole-file
+//! operations for text documents, as `o1s propose` sends, and whole-file
 //! edits for binary files and for repositories that predate graph documents.
 use crate::documents::GraphEdit;
 use crate::{Command, Edit, Kind, Refusal, Repository, base64_encode, valid_path};
-use o5s_kernel::model::{Anchor, DocumentGraph, NodeId, Operation};
+use o1s_kernel::model::{Anchor, DocumentGraph, NodeId, Operation};
 use std::collections::BTreeSet;
 
 /// The first line of every projection commit message.
-pub const TITLE: &str = "o5s verified-admission projection";
+pub const TITLE: &str = "o1s verified-admission projection";
 
 /// At most this many changed files in one workspace proposal.
 pub const MAX_FILES: usize = 1024;
@@ -76,7 +76,7 @@ pub fn heads(repo: &Repository, members: &[u64]) -> Result<Vec<u64>, Refusal> {
         rows[*m as usize] = p.dependencies.iter().map(|d| *d as usize).collect();
     }
     let dense: Vec<usize> = members.iter().map(|m| *m as usize).collect();
-    let heads = o5s_kernel::causality::heads(&rows, &dense, vec![false; len]);
+    let heads = o1s_kernel::causality::heads(&rows, &dense, vec![false; len]);
     Ok(heads.into_iter().map(|h| h as u64).collect())
 }
 
@@ -168,7 +168,7 @@ pub fn proposal(
     edits: Vec<Edit>,
 ) -> Result<Command, Refusal> {
     let (_, hashes) =
-        parse(message).ok_or_else(|| Refusal("workspace is not an o5s projection".into()))?;
+        parse(message).ok_or_else(|| Refusal("workspace is not an o1s projection".into()))?;
     if edits.is_empty() || edits.len() > MAX_FILES {
         return Err(Refusal(format!("1..{MAX_FILES} changed files required")));
     }
@@ -194,7 +194,7 @@ pub fn proposal(
 /// symlinks, submodules and paths that hold legacy documents, against the
 /// snapshot `deps`. `None` keeps a legacy repository's representation: one
 /// that has whole-file documents and none of whose graph documents changed.
-/// This is the rule `o5s propose` applies.
+/// This is the rule `o1s propose` applies.
 fn graph_edits(
     repo: &Repository,
     deps: &[u64],

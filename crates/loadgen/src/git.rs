@@ -3,7 +3,7 @@
 //! `git pull --rebase` and push again. A rebase conflict stops the agent with
 //! its change unintegrated, as it would stop an automated agent; a person or
 //! agent must then resolve it. Transport is `file://`, which favours Git:
-//! o5s requests cross loopback HTTP.
+//! o1s requests cross loopback HTTP.
 use crate::{Samples, Work, content, expected_line};
 use futures::{StreamExt, stream};
 use serde_json::{Value, json};

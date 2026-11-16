@@ -1,4 +1,4 @@
-use o5s_platform::{Actor, Command, Database};
+use o1s_platform::{Actor, Command, Database};
 use serde_json::json;
 
 fn command(v: serde_json::Value) -> Command {
@@ -43,10 +43,10 @@ fn stale_views_never_move_an_exported_ref_backwards() {
     let old = db.repo(&a(1), "r").unwrap().clone();
     admit(&mut db, "two", vec![first]);
     let new = db.repo(&a(1), "r").unwrap().clone();
-    let fresh = o5s_server::artifacts::export(dir.path(), 1, "r", "main", &new).unwrap();
-    let stale = o5s_server::artifacts::export(dir.path(), 1, "r", "main", &old).unwrap();
+    let fresh = o1s_server::artifacts::export(dir.path(), 1, "r", "main", &new).unwrap();
+    let stale = o1s_server::artifacts::export(dir.path(), 1, "r", "main", &old).unwrap();
     assert_eq!(stale["stale"], true);
     assert_eq!(stale["commit"], fresh["commit"]);
-    let again = o5s_server::artifacts::export(dir.path(), 1, "r", "main", &new).unwrap();
+    let again = o1s_server::artifacts::export(dir.path(), 1, "r", "main", &new).unwrap();
     assert_eq!(again["commit"], fresh["commit"]);
 }

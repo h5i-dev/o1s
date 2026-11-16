@@ -1,6 +1,6 @@
 import Document
 import DocKernel
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # How the dense document represents a history (draft)
 
@@ -10,7 +10,7 @@ patches, anchors, insertions, deletions and orders in arrival order.
 `Replayed d H` implies `Rep d H` (`rep_replayed`); validation, commit and
 materialization are proved against `Rep`.
 -/
-namespace o5s_kernel.DocRep
+namespace o1s_kernel.DocRep
 open DocModel Document
 
 /-! ## Refusal codes -/
@@ -2472,4 +2472,4 @@ theorem replayed_valid {d : document.Doc} {H : Hist} (h : Replayed d H) : Valid 
     rw [replay, applySpec_inserted adm.1 adm.2.1 adm.2.2.1 adm.2.2.2.1 adm.2.2.2.2 hval]
     rfl
 
-end o5s_kernel.DocRep
+end o1s_kernel.DocRep

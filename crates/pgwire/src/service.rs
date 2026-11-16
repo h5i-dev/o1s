@@ -3,8 +3,8 @@
 //! cache that probes the commit generation.
 use crate::{Connector, DbError, Engine, Idem, Outcome, Runtime, Tx};
 use h5i_app_sql::Val;
-use o5s_platform::{Actor, Command, Refusal, Repository, describe, plan, repository_key};
-use o5s_registry as kernel;
+use o1s_platform::{Actor, Command, Refusal, Repository, describe, plan, repository_key};
+use o1s_registry as kernel;
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -559,7 +559,7 @@ impl<C: Connector, R: Runtime> Service<C, R> {
 
     /// The repository view at a snapshot no older than this call.
     pub async fn repository(&self, actor: &Actor, name: &str) -> Result<Arc<Repository>, Failure> {
-        if actor.tenant >= kernel::REPOSITORY_SCOPE || !o5s_platform::valid_name(name) {
+        if actor.tenant >= kernel::REPOSITORY_SCOPE || !o1s_platform::valid_name(name) {
             return Err(not_found());
         }
         let scope = repository_key(actor.tenant, name);
@@ -592,7 +592,7 @@ impl<C: Connector, R: Runtime> Service<C, R> {
             Some(c) => (c.rows.clone(), (*c.view).clone()),
             None => (kernel::Snapshot::default(), Repository::default()),
         };
-        let writes = o5s_platform::delta(&old, &rows);
+        let writes = o1s_platform::delta(&old, &rows);
         let fresh: Vec<u64> = writes
             .iter()
             .filter_map(|w| match w {

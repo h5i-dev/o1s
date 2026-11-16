@@ -1,7 +1,7 @@
 import DocKahn
 import DocDepth
 import Document
-open Aeneas Aeneas.Std o5s_kernel
+open Aeneas Aeneas.Std o1s_kernel
 /-!
 # The model's depth and blocking satisfy the Kahn axioms
 
@@ -10,7 +10,7 @@ by index, the boundary relation as the model's `Sum`, and every live anchor
 indexed. Under it, `ax` derives the Kahn axioms from `DocDepth`. Also the
 index/anchor lemmas used to decode the kernel's view.
 -/
-namespace o5s_kernel.DocMatModel
+namespace o1s_kernel.DocMatModel
 open DocModel Document DocKahn DocDepth
 
 /-- The anchor at index `a` of the document's anchor table. -/
@@ -202,4 +202,4 @@ theorem anchorList_nodup (hk : ((ops H).map Prod.fst).Nodup) : (anchorList H).No
     and_false, exists_false, or_false, not_false_eq_true, true_and]
   exact List.Nodup.map (fun a b h => by cases h; rfl) hn
 
-end o5s_kernel.DocMatModel
+end o1s_kernel.DocMatModel

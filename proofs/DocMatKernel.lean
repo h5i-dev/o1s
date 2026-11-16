@@ -1,6 +1,6 @@
 import DocLayers
 import Order
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The extracted `materialize`, end to end
 
@@ -11,7 +11,7 @@ conflicts, liveness, the edge and dead rows, the boundary rows and counts of
 any depth and blocked predicates under which every boundary graph the code
 may build satisfies the Kahn axioms; `DocMatModel` supplies the model's.
 -/
-namespace o5s_kernel.DocKahn
+namespace o1s_kernel.DocKahn
 open DocKernel
 
 /-- The live edges of the kernel's edge table, as index pairs. -/
@@ -280,4 +280,4 @@ theorem materialize_kernel (doc : document.Doc) (wf : DocWF doc) (mwf : MatWF do
     | (have ha : v2.val.all (fun L => L.val.length = 1) = false := by rw [← hord]; simpa using h1
        simp [ha])
 
-end o5s_kernel.DocKahn
+end o1s_kernel.DocKahn

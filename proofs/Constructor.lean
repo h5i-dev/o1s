@@ -1,7 +1,7 @@
 import Projection
 
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Constructor
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Constructor
 
 def dead (edges : List (U64 × U64)) (live : List U64) :=
   edges.filter (fun e => decide (e.1 ∉ live))
@@ -130,4 +130,4 @@ theorem fold_append_map {α β : Type} (f : α → β) (xs : List α) (initial :
     all_goals simp_all [rowPredicates, List.map_append, alloc.vec.Vec.len]
     all_goals try scalar_tac
 
-end o5s_kernel.Constructor
+end o1s_kernel.Constructor

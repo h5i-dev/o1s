@@ -5,22 +5,22 @@ Ten agents work on a small expression parser: their edits to different lines
 of the same files merge, two of them collide on one line and leave a graph
 conflict, some patches wait for review, one fails its check, and a forked
 channel holds an experiment. Files are graph documents, edited the way
-`o5s propose` edits them: unchanged lines keep their identities.
+`o1s propose` edits them: unchanged lines keep their identities.
 
-    O5S_URL=http://127.0.0.1:3000 H5I_APP_SECRET=... scripts/seed-demo.py
+    O1S_URL=http://127.0.0.1:3000 H5I_APP_SECRET=... scripts/seed-demo.py
 
-O5S_SERVER is the o5s-server binary that signs tokens (default
-target/release/o5s-server, as scripts/dev.sh builds it); O5S_ORG the organization (default 1); O5S_REPO the
+O1S_SERVER is the o1s-server binary that signs tokens (default
+target/release/o1s-server, as scripts/dev.sh builds it); O1S_ORG the organization (default 1); O1S_REPO the
 repository name (default octo-parser). Prints a token for a viewer, whose
 role is read-only.
 """
 import json, os, pathlib, subprocess, sys, urllib.error, urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-ORIGIN = os.environ.get('O5S_URL', 'http://127.0.0.1:3000').rstrip('/')
-ORG = os.environ.get('O5S_ORG', '1')
-REPO = os.environ.get('O5S_REPO', 'octo-parser')
-SERVER = os.environ.get('O5S_SERVER', str(ROOT / 'target' / 'release' / 'o5s-server'))
+ORIGIN = os.environ.get('O1S_URL', 'http://127.0.0.1:3000').rstrip('/')
+ORG = os.environ.get('O1S_ORG', '1')
+REPO = os.environ.get('O1S_REPO', 'octo-parser')
+SERVER = os.environ.get('O1S_SERVER', str(ROOT / 'target' / 'release' / 'o1s-server'))
 if 'H5I_APP_SECRET' not in os.environ:
     sys.exit('set H5I_APP_SECRET to the server\'s signing key')
 
@@ -40,7 +40,7 @@ def api(user, route, body=None):
         ORIGIN + route, data=None if body is None else json.dumps(body).encode(),
         headers={'Authorization': 'Bearer ' + token(user), 'Content-Type': 'application/json',
                  # Cloudflare refuses urllib's default agent (error 1010).
-                 'User-Agent': 'o5s-seed-demo'})
+                 'User-Agent': 'o1s-seed-demo'})
     try:
         with urllib.request.urlopen(request) as response:
             return json.load(response)

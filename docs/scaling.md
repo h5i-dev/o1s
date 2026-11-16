@@ -11,7 +11,7 @@ The local platform supports immutable whole-file edits and line ranges anchored 
 Reproduce the in-memory work experiment:
 
 ```sh
-cargo run -p o5s-platform --example scaling
+cargo run -p o1s-platform --example scaling
 ```
 
 The fixtures use 10,000 patches/vertices. Counters are asserted in tests:
@@ -47,7 +47,7 @@ Rebuilding a large affected component can remain expensive. The constructor may 
 
 - [Eg-walker, EuroSys 2025](https://arxiv.org/pdf/2409.14252) separates persistent causal event history from temporary merge state and compresses consecutive operations. Its collaborative-text event graph is different from Pijul's content graph. We adopt batching, lazy reconstruction and cached derived state, without claiming to implement its transformation algorithm or reproduce its reported speedups. Safe block compaction needs an edit/identity model and a proof before it can replace line vertices.
 - [Loro's event graph walker](https://loro.dev/docs/concepts/event_graph_walker) and its [MIT implementation](https://github.com/loro-dev/loro) are useful references for version traversal and collaborative text. No Loro code or dependency is incorporated. The application currently needs explicit unresolved alternatives and reviewed resolutions; substituting a text CRDT would not by itself provide those review semantics.
-- [Incremental Topological Ordering and Cycle Detection with Predictions](https://arxiv.org/html/2402.11028v1) studies prediction-assisted dynamic graph algorithms. Patch dependency handles already give a topological order by construction, so adding a dynamic ordering algorithm there would add complexity without removing a present bottleneck. Future line-graph ordering must also preserve concurrency; an arbitrary total order is not a conflict-resolution specification. This paper is not evidence that o5s currently implements a near-linear dynamic algorithm.
+- [Incremental Topological Ordering and Cycle Detection with Predictions](https://arxiv.org/html/2402.11028v1) studies prediction-assisted dynamic graph algorithms. Patch dependency handles already give a topological order by construction, so adding a dynamic ordering algorithm there would add complexity without removing a present bottleneck. Future line-graph ordering must also preserve concurrency; an arbitrary total order is not a conflict-resolution specification. This paper is not evidence that o1s currently implements a near-linear dynamic algorithm.
 - [Pijul theory](https://pijul.org/manual/theory) motivates preserving original graph information and treating pseudo-edges as derived summaries. The implementation here is an independent reachability experiment, not a port of libpijul or a complete proof of its patch algebra.
 
 The next production bottleneck is the whole-database snapshot transaction. Database indexing, shared immutable channel membership, pagination, persistent cache checkpoints and snapshot-bound combined-program checks should precede any claim of distributed agent-scale readiness.

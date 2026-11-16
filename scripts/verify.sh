@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Format, tests (PostgreSQL ones when O5S_TEST_DATABASE_URL is set; use
+# Format, tests (PostgreSQL ones when O1S_TEST_DATABASE_URL is set; use
 # `scripts/postgres.sh` for a local one), UI checks, and both Lean projects:
 # the kernels in proofs/ and the registry in crates/registry/proofs/, plus
 # the pending statements in specs/ and crates/registry/specs/.
@@ -8,11 +8,11 @@ cd "$(dirname "$0")/.."
 export CARGO_PROFILE_DEV_DEBUG=0
 export CARGO_INCREMENTAL=0
 cargo fmt --all --check
-if [[ -z "${O5S_TEST_DATABASE_URL:-}" ]]; then
-    echo "O5S_TEST_DATABASE_URL unset: PostgreSQL tests are skipped"
+if [[ -z "${O1S_TEST_DATABASE_URL:-}" ]]; then
+    echo "O1S_TEST_DATABASE_URL unset: PostgreSQL tests are skipped"
 fi
 cargo test --workspace
-cargo check -p o5s-worker --target wasm32-unknown-unknown
+cargo check -p o1s-worker --target wasm32-unknown-unknown
 if ! command -v node >/dev/null; then
     # Node 24 from Docker when it is not installed.
     node() { docker run --rm -i -v "$PWD":/w -w /w node:24-slim node "$@"; }

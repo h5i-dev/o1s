@@ -1,6 +1,6 @@
 import DocCommit
 import DocMaterialize
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The materializer's tables, read through the representation (draft)
 
@@ -9,7 +9,7 @@ the globally withdrawn edges are the retracted ones, its edge rows are the
 model's `E H`, its liveness is `Live H`. `materialize_refines` composes these
 with the Kahn layering.
 -/
-namespace o5s_kernel.DocView
+namespace o1s_kernel.DocView
 open DocModel Document DocRep DocKernel
 
 /-- Edge index `1 + j` is withdrawn for everyone exactly when fact `j`'s
@@ -265,4 +265,4 @@ theorem segment_map {α β} (φ : α → β) (S : α → Prop) (edges : List (α
         exact .extend (ih hSx) (by rw [hlive _ hSx]; exact hx) ((hE _ _ hSx hSy).mpr h3)
     exact key _ h hv
 
-end o5s_kernel.DocView
+end o1s_kernel.DocView

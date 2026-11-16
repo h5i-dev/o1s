@@ -98,13 +98,13 @@ pub enum Revocation {
 
 /// Tables of the PostgreSQL store, created with the registry's.
 pub const DDL: [&str; 2] = [
-    "CREATE TABLE IF NOT EXISTS o5s_revoked_users (
+    "CREATE TABLE IF NOT EXISTS o1s_revoked_users (
   tenant_id BIGINT NOT NULL,
   user_id BIGINT NOT NULL,
   not_after BIGINT NOT NULL,
   PRIMARY KEY (tenant_id, user_id)
 )",
-    "CREATE TABLE IF NOT EXISTS o5s_revoked_tokens (
+    "CREATE TABLE IF NOT EXISTS o1s_revoked_tokens (
   digest TEXT PRIMARY KEY,
   expires BIGINT NOT NULL
 )",
@@ -142,8 +142,8 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
             let rows = c
                 .query_typed(
                     &format!(
-                        "SELECT EXISTS (SELECT 1 FROM {schema}.o5s_revoked_users WHERE tenant_id = $1 AND user_id = $2 AND not_after >= $3) \
-                         OR EXISTS (SELECT 1 FROM {schema}.o5s_revoked_tokens WHERE digest = $4)"
+                        "SELECT EXISTS (SELECT 1 FROM {schema}.o1s_revoked_users WHERE tenant_id = $1 AND user_id = $2 AND not_after >= $3) \
+                         OR EXISTS (SELECT 1 FROM {schema}.o1s_revoked_tokens WHERE digest = $4)"
                     ),
                     &[(&t, Type::INT8), (&u, Type::INT8), (&e, Type::INT8), (&d, Type::TEXT)],
                 )
@@ -163,8 +163,8 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
                 } => {
                     c.query_typed(
                         &format!(
-                            "INSERT INTO {schema}.o5s_revoked_users (tenant_id, user_id, not_after) VALUES ($1, $2, $3) \
-                             ON CONFLICT (tenant_id, user_id) DO UPDATE SET not_after = GREATEST({schema}.o5s_revoked_users.not_after, EXCLUDED.not_after)"
+                            "INSERT INTO {schema}.o1s_revoked_users (tenant_id, user_id, not_after) VALUES ($1, $2, $3) \
+                             ON CONFLICT (tenant_id, user_id) DO UPDATE SET not_after = GREATEST({schema}.o1s_revoked_users.not_after, EXCLUDED.not_after)"
                         ),
                         &[
                             (&signed(*tenant)?, Type::INT8),
@@ -177,7 +177,7 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
                 Revocation::Token { digest, expires } => {
                     c.query_typed(
                         &format!(
-                            "INSERT INTO {schema}.o5s_revoked_tokens (digest, expires) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING"
+                            "INSERT INTO {schema}.o1s_revoked_tokens (digest, expires) VALUES ($1, $2) ON CONFLICT (digest) DO NOTHING"
                         ),
                         &[
                             (digest, Type::TEXT),
@@ -199,7 +199,7 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
             let rows = c
                 .query_typed(
                     &format!(
-                        "SELECT not_after FROM {schema}.o5s_revoked_users WHERE tenant_id = $1 AND user_id = $2"
+                        "SELECT not_after FROM {schema}.o1s_revoked_users WHERE tenant_id = $1 AND user_id = $2"
                     ),
                     &[(&t, Type::INT8), (&u, Type::INT8)],
                 )

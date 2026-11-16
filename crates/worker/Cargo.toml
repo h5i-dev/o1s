@@ -1,21 +1,21 @@
 [package]
-name = "o5s-worker"
+name = "o1s-worker"
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
 publish = false
-description = "The o5s API on Cloudflare Workers: the registry kernel over PostgreSQL through Hyperdrive"
+description = "The o1s API on Cloudflare Workers: the registry kernel over PostgreSQL through Hyperdrive"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-o5s-pgwire = { path = "../pgwire" }
-o5s-gitpush = { path = "../gitpush" }
+o1s-pgwire = { path = "../pgwire" }
+o1s-gitpush = { path = "../gitpush" }
 js-sys = "0.3"
 wasm-bindgen = "0.2"
-o5s-platform = { path = "../platform" }
-o5s-registry = { path = "../registry", features = ["serde"] }
+o1s-platform = { path = "../platform" }
+o1s-registry = { path = "../registry", features = ["serde"] }
 h5i-app-json = "0.1.1"
 h5i-app-token = "0.1.1"
 libcrux-hmac = "0.0.8"

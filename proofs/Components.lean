@@ -1,6 +1,6 @@
 import Projection
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Components
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Components
 open Projection
 
 /-- Isolation follows from closure under both directions of original edges. -/
@@ -152,4 +152,4 @@ theorem extracted_batch_incremental (before added old fresh : List (U64 × U64))
   simp only [heq]
   exact batch_incremental before added old fresh live nextLive seeds.val
     oldSummary freshSummary newSeeds liveSeeds
-end o5s_kernel.Components
+end o1s_kernel.Components

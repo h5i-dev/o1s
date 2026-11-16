@@ -1,7 +1,7 @@
-import O5sKernel
+import O1sKernel
 import StdSpecs
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Interval
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Interval
 
 def Conflict (a z b w : U64) : Prop :=
   if a = z then b ≤ a ∧ a ≤ w
@@ -58,4 +58,4 @@ def Conflict (a z b w : U64) : Prop :=
     h5i_step
     all_goals scalar_tac
 
-end o5s_kernel.Interval
+end o1s_kernel.Interval

@@ -1,7 +1,7 @@
 //! The changes between two Git trees, read through any object store: what an
 //! agent's commits in its Artifacts workspace change relative to the snapshot
 //! it started from. Unchanged subtrees (equal ids) are never read.
-use o5s_platform::{Edit, Kind as PKind, Refusal, workspace};
+use o1s_platform::{Edit, Kind as PKind, Refusal, workspace};
 use std::collections::BTreeMap;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -161,11 +161,11 @@ pub async fn changes<O: Objects>(o: &O, base: &str, head: &str) -> Result<Vec<Ed
 #[cfg(test)]
 mod tests {
     use super::*;
-    use o5s_gitpush as git;
+    use o1s_gitpush as git;
     use std::cell::RefCell;
     use std::collections::BTreeMap;
 
-    /// Objects built by `o5s_gitpush`, read back by parsing tree bodies.
+    /// Objects built by `o1s_gitpush`, read back by parsing tree bodies.
     #[derive(Default)]
     struct Store {
         objects: BTreeMap<String, git::Object>,

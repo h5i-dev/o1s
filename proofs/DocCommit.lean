@@ -1,6 +1,6 @@
 import DocRep
 import DocKernelCommit
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Commit keeps the representation (draft)
 
@@ -11,7 +11,7 @@ operation to the history (`Snoc`), and `rep_op` shows every field of the
 encoding follows. `Good` collects the facts about earlier operations the
 re-encoding needs (their anchors, targets and references are interned).
 -/
-namespace o5s_kernel.DocRep
+namespace o1s_kernel.DocRep
 open DocModel Document
 
 /-! ## One more operation -/
@@ -1194,4 +1194,4 @@ theorem rep_replayed (d : document.Doc) (H : Hist) (h : Replayed d H) : Rep d H 
     rw [hd']
     exact rep_commit' _ H P dp ih hb ht adm hval
 
-end o5s_kernel.DocRep
+end o1s_kernel.DocRep

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>o5s · verified version control for agent swarms</title>
+<title>o1s · verified version control for agent swarms</title>
 <meta name="theme-color" content="#D21C1C">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Cpath fill=%22%23ff6258%22 d=%22M12 2c4.4 0 7.5 3.1 7.5 7.3 0 2.4-1 4.2-2.6 5.4.5 1.8 1.9 3 3.6 3.3-1.3 1.2-3.6 1.3-5.2.1-.3 1.6-1.4 3-3.3 3.6.3-1.4-.1-2.7-1-3.6-.9.9-1.3 2.2-1 3.6-1.9-.6-3-2-3.3-3.6-1.6 1.2-3.9 1.1-5.2-.1 1.7-.3 3.1-1.5 3.6-3.3C3.5 13.5 4.5 11.7 4.5 9.3 4.5 5.1 7.6 2 12 2z%22/%3E%3Ccircle cx=%229.3%22 cy=%229.6%22 r=%221.5%22 fill=%22%23050506%22/%3E%3Ccircle cx=%2214.7%22 cy=%229.6%22 r=%221.5%22 fill=%22%23050506%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +56,7 @@ a,button{color:inherit}button,input,select{font:inherit}
 .bar-row{display:grid;gap:3px}.bar-row>span{color:var(--ink-3)}
 .bar{position:relative;height:9px;width:max(var(--v),2px)}
 .bar i{position:absolute;left:calc(100% + 8px);top:-5px;white-space:nowrap;font:400 11px var(--mono);font-style:normal;color:var(--ink-2)}
-.bar.git{background:var(--line-strong)}.bar.o5s{background:linear-gradient(90deg,#9c1510,var(--accent))}.bar.o5s i{color:var(--accent)}
+.bar.git{background:var(--line-strong)}.bar.o1s{background:linear-gradient(90deg,#9c1510,var(--accent))}.bar.o1s i{color:var(--accent)}
 .site-foot{display:flex;justify-content:space-between;gap:16px;padding:22px 40px;border-top:1px solid var(--line);color:var(--ink-3);font:400 11px var(--mono);letter-spacing:.08em}
 
 /* Repositories */
@@ -123,8 +123,8 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--ink-2);font:400 11px 
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style></head><body>
 <header class="frame-top">
-  <a class="brand" href="#/" aria-label="o5s home"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#ff6258" d="M12 2c4.4 0 7.5 3.1 7.5 7.3 0 2.4-1 4.2-2.6 5.4.5 1.8 1.9 3 3.6 3.3-1.3 1.2-3.6 1.3-5.2.1-.3 1.6-1.4 3-3.3 3.6.3-1.4-.1-2.7-1-3.6-.9.9-1.3 2.2-1 3.6-1.9-.6-3-2-3.3-3.6-1.6 1.2-3.9 1.1-5.2-.1 1.7-.3 3.1-1.5 3.6-3.3C3.5 13.5 4.5 11.7 4.5 9.3 4.5 5.1 7.6 2 12 2z"/><circle cx="9.3" cy="9.6" r="1.5" fill="#050506"/><circle cx="14.7" cy="9.6" r="1.5" fill="#050506"/></svg><span>o5s</span></a>
-  <nav class="nav" aria-label="Pages"><a href="#/" id="nav-home">what is o5s</a><a href="#/repos" id="nav-repos">repositories</a><a href="https://github.com/h5i-dev/o5s" rel="noopener">github</a></nav>
+  <a class="brand" href="#/" aria-label="o1s home"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#ff6258" d="M12 2c4.4 0 7.5 3.1 7.5 7.3 0 2.4-1 4.2-2.6 5.4.5 1.8 1.9 3 3.6 3.3-1.3 1.2-3.6 1.3-5.2.1-.3 1.6-1.4 3-3.3 3.6.3-1.4-.1-2.7-1-3.6-.9.9-1.3 2.2-1 3.6-1.9-.6-3-2-3.3-3.6-1.6 1.2-3.9 1.1-5.2-.1 1.7-.3 3.1-1.5 3.6-3.3C3.5 13.5 4.5 11.7 4.5 9.3 4.5 5.1 7.6 2 12 2z"/><circle cx="9.3" cy="9.6" r="1.5" fill="#050506"/><circle cx="14.7" cy="9.6" r="1.5" fill="#050506"/></svg><span>o1s</span></a>
+  <nav class="nav" aria-label="Pages"><a href="#/" id="nav-home">what is o1s</a><a href="#/repos" id="nav-repos">repositories</a><a href="https://github.com/h5i-dev/o1s" rel="noopener">github</a></nav>
 </header>
 
 <main id="home-page">
@@ -132,38 +132,38 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--ink-2);font:400 11px 
     <canvas class="wall" id="wall" aria-hidden="true"></canvas>
     <div class="scrim"></div>
     <div class="hero">
-      <div class="kicker mono">o5s · octopus</div>
+      <div class="kicker mono">o1s · octopus</div>
       <h1 id="hero-title"><i>Verified</i> version control<br>for agent swarms.</h1>
       <p>Every change is an immutable patch. Agents propose against what they saw; non-conflicting patches merge in any order with the same result. The core is proved in Lean 4 against the Rust that runs.</p>
     </div>
     <p class="note" aria-hidden="true">// eight arms, one channel.</p>
     <a class="enter" href="#/repos">repositories ↩</a>
   </section>
-  <section class="facts" aria-label="What o5s does">
+  <section class="facts" aria-label="What o1s does">
     <div class="fact"><div class="mono">01 · no rebase</div><h2>Patches, not pushes.</h2><p>Disjoint patches commute. Different lines of one file merge; nobody loses a race.</p></div>
     <div class="fact"><div class="mono">02 · conflicts</div><h2>Conflicts are data.</h2><p>Overlapping edits stay side by side until a reviewed resolution patch is admitted.</p></div>
     <div class="fact"><div class="mono">03 · review</div><h2>Gated admission.</h2><p>A patch enters a channel only with an independent approval and a passing check.</p></div>
     <div class="fact"><div class="mono">04 · proofs</div><h2>Verified core.</h2><p>Every registry decision is extracted Rust, proved in Lean: invariant, gate, isolation.</p></div>
   </section>
-  <section class="how" aria-label="Comparison with Git, and how agents use o5s">
+  <section class="how" aria-label="Comparison with Git, and how agents use o1s">
     <div>
-      <div class="code bars" role="img" aria-label="Integrations per second, Git against o5s">
+      <div class="code bars" role="img" aria-label="Integrations per second, Git against o1s">
       <em># integrations/s · 1,000 agents, 64 in flight, one host</em>
-      <div class="bar-row"><span>different lines, one file</span><div class="bar git" style="--v:1.5%"><i>git 9.8</i></div><div class="bar o5s" style="--v:37%"><i>o5s 574</i></div></div>
-      <div class="bar-row"><span>one new file each</span><div class="bar git" style="--v:0.7%"><i>git 9.0</i></div><div class="bar o5s" style="--v:70%"><i>o5s 1,083</i></div></div>
-      <div class="bar-row"><span>one repository each</span><div class="bar git" style="--v:45%"><i>git 691</i></div><div class="bar o5s" style="--v:58%"><i>o5s 896</i></div></div>
+      <div class="bar-row"><span>different lines, one file</span><div class="bar git" style="--v:1.5%"><i>git 9.8</i></div><div class="bar o1s" style="--v:37%"><i>o1s 574</i></div></div>
+      <div class="bar-row"><span>one new file each</span><div class="bar git" style="--v:0.7%"><i>git 9.0</i></div><div class="bar o1s" style="--v:70%"><i>o1s 1,083</i></div></div>
+      <div class="bar-row"><span>one repository each</span><div class="bar git" style="--v:45%"><i>git 691</i></div><div class="bar o1s" style="--v:58%"><i>o1s 896</i></div></div>
     </div></div>
     <div><pre class="code"><em># an agent</em>
-<b>o5s</b> connect demo
-<b>o5s</b> propose --intent 'Add the parser'
+<b>o1s</b> connect demo
+<b>o1s</b> propose --intent 'Add the parser'
 <em># independent reviewer and checks</em>
-<b>o5s</b> --profile reviewer approve 1
-<b>o5s</b> --profile checks check 1 --pass
-<b>o5s</b> --profile reviewer merge 1
+<b>o1s</b> --profile reviewer approve 1
+<b>o1s</b> --profile checks check 1 --pass
+<b>o1s</b> --profile reviewer merge 1
 <em># everyone</em>
-<b>o5s</b> fetch            <em># → refs/o5s/main</em></pre></div>
+<b>o1s</b> fetch            <em># → refs/o1s/main</em></pre></div>
   </section>
-  <footer class="site-foot"><span>o5s · Apache-2.0</span><span>draws on Pijul's ideas · contains no Pijul code</span></footer>
+  <footer class="site-foot"><span>o1s · Apache-2.0</span><span>draws on Pijul's ideas · contains no Pijul code</span></footer>
 </main>
 
 <main id="repos-page" class="console" hidden aria-labelledby="repos-title">
@@ -471,7 +471,7 @@ function route() {
   guide.maybe(repos);
 }
 
-// The octopus: a wall of o5s's own code; the creature is the code's light.
+// The octopus: a wall of o1s's own code; the creature is the code's light.
 // Its shape is drawn into an offscreen canvas one pixel per character cell,
 // and each cell's character takes that pixel's brightness. Its arms reach
 // for drifting patches and carry them into the channel on the right.
@@ -657,7 +657,7 @@ theorem isolation : actor.org ≠ repo.org → ¬ visible actor repo
       const hot = t - g.sent < 900;
       ctx.fillStyle = hot ? '#ff6258' : 'rgba(235,230,219,0.55)';
       const cursor = Math.floor(t / 530 + g.y) % 2 ? '▍' : ' ';
-      ctx.fillText(`${g.name} $ ${hot ? 'o5s propose ↗' : 'edit' + cursor}`, g.x * CW - 4, g.y * CH - 6);
+      ctx.fillText(`${g.name} $ ${hot ? 'o1s propose ↗' : 'edit' + cursor}`, g.x * CW - 4, g.y * CH - 6);
     }
     ctx.font = '500 12px "IBM Plex Mono", Menlo, monospace';
     for (const p of patches) {
@@ -865,7 +865,7 @@ const guide = (() => {
     $('guide-say').hidden = true;
     if (target) target.classList.remove('guided');
     target = null; step = -1; drawArm(0);
-    try { localStorage.setItem('o5s.guide', 'seen'); } catch (_) {}
+    try { localStorage.setItem('o1s.guide', 'seen'); } catch (_) {}
   }
   function start() {
     idle(true);
@@ -885,7 +885,7 @@ const guide = (() => {
       if (!visible) { if (step >= 0) stop(); idle(false); return; }
       idle(true);
       let seen = null;
-      try { seen = localStorage.getItem('o5s.guide'); } catch (_) {}
+      try { seen = localStorage.getItem('o1s.guide'); } catch (_) {}
       if (!seen && step < 0) setTimeout(start, 700);
     }
   };

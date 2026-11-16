@@ -1,9 +1,9 @@
-import O5sKernel
+import O1sKernel
 import StdSpecs
 
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 
-namespace o5s_kernel.Patch
+namespace o1s_kernel.Patch
 
 /-- The specification adds a patch without changing its identity or discarding
 any prior patch. List order is deliberately not part of channel identity. -/
@@ -108,4 +108,4 @@ theorem successful_orders_converge
       (merge_authorized s e sq true true q rs hq).2.2.2]
   exact insert_commutes s.val p q x
 
-end o5s_kernel.Patch
+end o1s_kernel.Patch

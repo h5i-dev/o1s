@@ -1,4 +1,4 @@
-use o5s_platform::*;
+use o1s_platform::*;
 use std::collections::BTreeSet;
 fn add(r: &mut Repository, id: u64, dependencies: Vec<u64>, path: &str, content: Option<String>) {
     r.patches.insert(

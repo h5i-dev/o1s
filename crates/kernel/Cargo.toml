@@ -1,6 +1,6 @@
 [package]
-name = "o5s-kernel"
-description = "Verified patch admission and collaboration kernel for o5s"
+name = "o1s-kernel"
+description = "Verified patch admission and collaboration kernel for o1s"
 edition = "2024"
 license = "Apache-2.0"
 version = "0.1.0"
