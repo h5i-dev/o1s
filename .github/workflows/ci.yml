@@ -96,6 +96,7 @@ jobs:
   # from the kernels today.
   extract:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -103,16 +104,9 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/h5i-dev/h5i/$H5I_VERSION/install.sh | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            extra-substituters = https://hacl.cachix.org
-            extra-trusted-public-keys = hacl.cachix.org-1:FzsZ2xsByOwKwIWNPII7yMOelJNDZ12mDAj3d1eGX0c=
-      - uses: DeterminateSystems/magic-nix-cache-action@v8
-      - name: Build Charon and Aeneas at the pinned commit
-        run: |
-          nix build "github:AeneasVerif/aeneas/$AENEAS_REV" -o "$RUNNER_TEMP/aeneas" -L
-          nix build "github:AeneasVerif/aeneas/$AENEAS_REV#charon" -o "$RUNNER_TEMP/charon" -L
-          echo "$RUNNER_TEMP/aeneas/bin" >> "$GITHUB_PATH"
-          echo "$RUNNER_TEMP/charon/bin" >> "$GITHUB_PATH"
+      # Prebuilt Charon and Aeneas from Aeneas's release at the pinned commit
+      # (checksum-verified), not a ~19-minute Nix build.
+      - name: Install Charon and Aeneas at the pinned commit
+        timeout-minutes: 5
+        run: scripts/install-aeneas.sh "$RUNNER_TEMP/aeneas" >> "$GITHUB_PATH"
       - run: h5i app extract --check . crates/registry
