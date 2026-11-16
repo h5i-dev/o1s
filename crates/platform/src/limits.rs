@@ -1,7 +1,7 @@
 //! Operator limits: repositories per organization, patches per repository and
 //! commands per minute per user. Unset limits are unlimited. They are set once
-//! per process (`set`), from `O5S_MAX_REPOSITORIES`, `O5S_MAX_PATCHES` and
-//! `O5S_COMMANDS_PER_MINUTE` on the native server and the Worker's variables.
+//! per process (`set`), from `O1S_MAX_REPOSITORIES`, `O1S_MAX_PATCHES` and
+//! `O1S_COMMANDS_PER_MINUTE` on the native server and the Worker's variables.
 use crate::{Actor, Refusal};
 use std::{
     collections::HashMap,
@@ -26,9 +26,9 @@ impl Limits {
                 .transpose()
         }
         Ok(Limits {
-            max_repositories: parse("O5S_MAX_REPOSITORIES", get("O5S_MAX_REPOSITORIES"))?,
-            max_patches: parse("O5S_MAX_PATCHES", get("O5S_MAX_PATCHES"))?,
-            commands_per_minute: parse("O5S_COMMANDS_PER_MINUTE", get("O5S_COMMANDS_PER_MINUTE"))?,
+            max_repositories: parse("O1S_MAX_REPOSITORIES", get("O1S_MAX_REPOSITORIES"))?,
+            max_patches: parse("O1S_MAX_PATCHES", get("O1S_MAX_PATCHES"))?,
+            commands_per_minute: parse("O1S_COMMANDS_PER_MINUTE", get("O1S_COMMANDS_PER_MINUTE"))?,
         })
     }
 }
@@ -119,8 +119,8 @@ mod tests {
     #[test]
     fn limits_parse_from_the_environment() {
         let env = |k: &str| match k {
-            "O5S_MAX_PATCHES" => Some("10".to_string()),
-            "O5S_COMMANDS_PER_MINUTE" => Some(String::new()),
+            "O1S_MAX_PATCHES" => Some("10".to_string()),
+            "O1S_COMMANDS_PER_MINUTE" => Some(String::new()),
             _ => None,
         };
         assert_eq!(

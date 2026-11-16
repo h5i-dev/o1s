@@ -9,9 +9,9 @@ the command makes, the matching rows in the same relative order. Under it the
 model gives the same result, so a run of `transition` on a narrow load
 computes what the whole tenant specifies (`narrow_load`).
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec H5iAppLib
 
-namespace o5s_registry.Narrow
+namespace o1s_registry.Narrow
 
 /-- The rows of `l₁` and `l₂` that satisfy `P` are the same, in the same order. -/
 def Agree {α} (P : α → Bool) (l₁ l₂ : List α) : Prop := l₁.filter P = l₂.filter P
@@ -166,4 +166,4 @@ theorem narrow_load (a : Principal) (s p : Snapshot) (c : Command)
   rw [Refine.transition_refines _ _ _ _ h]
   exact narrow_model a _ _ c hn
 
-end o5s_registry.Narrow
+end o1s_registry.Narrow

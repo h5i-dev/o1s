@@ -1,6 +1,6 @@
 import Components
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Indexed
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Indexed
 
 structure Seen (marks : List Bool) (queue : List Usize) : Prop where
   nodup : queue.Nodup
@@ -320,4 +320,4 @@ theorem empty_seen (marks : alloc.vec.Vec Bool) (clean : Clean marks.val) : Seen
     · intro j hj hc; omega
   · exact ⟨v_post.2.nodup, fun _ => Iff.rfl, v_post.1⟩
 
-end o5s_kernel.Indexed
+end o1s_kernel.Indexed

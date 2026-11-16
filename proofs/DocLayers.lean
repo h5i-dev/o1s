@@ -2,7 +2,7 @@ import DocKahn
 import DocMaterialize
 import DocKernelCommit
 import Boundary
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The loops of `materialize` around the Kahn layering
 
@@ -12,7 +12,7 @@ atoms reached through dead interiors, `BRow`), the predecessor counts and the
 list of live atoms (`L1Inv`). The remaining loops initialise the counts,
 collect the blocked atoms and test whether every layer is a single atom.
 -/
-namespace o5s_kernel.DocKernel
+namespace o1s_kernel.DocKernel
 
 theorem foldl_toList {α β} (f : α → Option β) (l : List α) (init : List β) :
     l.foldl (fun acc i => acc ++ (f i).toList) init = init ++ l.filterMap f := by
@@ -261,9 +261,9 @@ theorem all_rows_spec (doc : document.Doc)
            obtain ⟨a, ⟨x, hx⟩, ha⟩ := (off_post1 i hi').mp hc
            exact ⟨(a, x), hx, ha⟩)
 
-end o5s_kernel.DocKernel
+end o1s_kernel.DocKernel
 
-namespace o5s_kernel.DocKahn
+namespace o1s_kernel.DocKahn
 
 /-- `v'` is `v` with one increment at each vertex of `l`. -/
 def AddRel (v' v : List Usize) (l : List Nat) : Prop :=
@@ -565,4 +565,4 @@ theorem loop4_spec (v : alloc.vec.Vec (alloc.vec.Vec Usize)) :
          · have := congrArg UScalar.val h; simpa using this
          · apply UScalar.eq_of_val_eq; simpa using h)
 
-end o5s_kernel.DocKahn
+end o1s_kernel.DocKahn

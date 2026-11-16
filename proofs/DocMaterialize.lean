@@ -1,6 +1,6 @@
 import DocKernel
 import Tags
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Specifications of the document kernel's materializer (draft)
 
@@ -8,7 +8,7 @@ List-level meanings of `document::{liveness, delete_inserts, summaries,
 kahn, emit, materialize}`; `DocView.lean` relates them to `DocModel.IsView`
 through the representation of `DocRep.lean`.
 -/
-namespace o5s_kernel.DocKernel
+namespace o1s_kernel.DocKernel
 
 /-! ## Liveness -/
 
@@ -569,4 +569,4 @@ theorem dead_rows_spec (rows : alloc.vec.Vec (alloc.vec.Vec Usize)) (live : allo
          rw [List.getElem?_eq_getElem h1, Option.getD_some, hb, List.getElem?_eq_getElem h2]
          simp)
 
-end o5s_kernel.DocKernel
+end o1s_kernel.DocKernel

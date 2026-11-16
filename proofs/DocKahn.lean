@@ -1,6 +1,6 @@
 import DocKernel
 import Interval
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Kahn layering in the extracted `materialize`
 
@@ -17,7 +17,7 @@ unblocked live atom is layered, and the atoms left over are exactly the
 blocked ones. The document instance of `KG` takes depth and blocking from
 `DocModel` (`DocDepth.lean` proves the step characterisation).
 -/
-namespace o5s_kernel.DocKahn
+namespace o1s_kernel.DocKahn
 
 /-- The graph `materialize` layers: vertices `0..n`, a liveness table, the
 boundary successors of each live vertex, and the depth and blocked predicates
@@ -909,4 +909,4 @@ theorem loop2_spec (ax : g.Ax) (doc : document.Doc) (bv : alloc.vec.Vec (alloc.v
   · exact ⟨r, hI⟩
 
 end KG
-end o5s_kernel.DocKahn
+end o1s_kernel.DocKahn

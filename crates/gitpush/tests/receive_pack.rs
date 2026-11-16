@@ -1,6 +1,6 @@
 //! Push through `git receive-pack --stateless-rpc`, the program a Git HTTP
 //! server runs, and check the result with Git itself.
-use o5s_gitpush::*;
+use o1s_gitpush::*;
 use std::{
     collections::BTreeMap,
     io::Write,
@@ -71,7 +71,7 @@ fn push(dir: &Path, files: &BTreeMap<String, File>, message: &str) -> Result<Oid
     let c = commit(
         &tree_id,
         old.as_ref(),
-        "o5s <o5s@localhost>",
+        "o1s <o1s@localhost>",
         1_791_741_000,
         message,
     );
@@ -190,7 +190,7 @@ fn a_stale_old_value_is_refused() {
     push(dir.path(), &files(&[("f", b"2", false)]), "two").unwrap();
     // A writer that still believes main is at c1.
     let (t, mut objects) = tree(&files(&[("f", b"3", false)])).unwrap();
-    let c = commit(&t, Some(&c1), "o5s <o5s@localhost>", 0, "stale");
+    let c = commit(&t, Some(&c1), "o1s <o1s@localhost>", 0, "stale");
     let new = c.id();
     objects.push(c);
     let body = push_request("refs/heads/main", &c1, &new, &pack(&objects));

@@ -7,9 +7,9 @@ lists. `Refine.lean` proves the extracted `transition` returns exactly this
 whenever it returns at all, so the theorems in `Theorems.lean` are about
 `Model.step` only.
 -/
-open Aeneas Aeneas.Std o5s_registry o5s_registry.Spec o5s_registry.Exact
+open Aeneas Aeneas.Std o1s_registry o1s_registry.Spec o1s_registry.Exact
 
-namespace o5s_registry.Model
+namespace o1s_registry.Model
 
 /-- A command's result, with writes as a list. -/
 abbrev Out := core.result.Result (List Write × Reply) Error
@@ -117,15 +117,15 @@ def check (u : U64) (s : St) (patch : U64) (passed : Bool) : Out :=
       .Ok ([.PutCheck ⟨patch, passed, u⟩, .SetRepository { s.repo with events := i },
         .PutEvent ⟨i, u, CHECK, some patch, none⟩], .Checked patch passed)
 
-/-- `o5s_kernel::patch::merge`. -/
+/-- `o1s_kernel::patch::merge`. -/
 def admitK (channel deps : List U64) (approved checks : Bool) (id : U64) :
-    core.result.Result (List U64) o5s_kernel.patch.MergeError :=
+    core.result.Result (List U64) o1s_kernel.patch.MergeError :=
   if !approved then .Err .Unapproved
   else if !checks then .Err .ChecksFailed
   else if deps.all (fun d => decide (d ∈ channel)) then .Ok (if id ∈ channel then channel else channel ++ [id])
   else .Err .MissingDependency
 
-def mergeError : o5s_kernel.patch.MergeError → Error
+def mergeError : o1s_kernel.patch.MergeError → Error
   | .Unapproved => .Unapproved
   | .ChecksFailed => .ChecksFailed
   | .MissingDependency => .MissingDependency
@@ -236,4 +236,4 @@ def step (a : Principal) (s : St) : Command → Out
   | .Grant repo u lvl => guarded a s repo ADMIN (grant a s u lvl)
   | _ => .Err .ReadOnly
 
-end o5s_registry.Model
+end o1s_registry.Model

@@ -1,5 +1,5 @@
 {
-  "o5s": {
+  "o1s": {
     "approve_and_check": {
       "failed": 0,
       "max_ms": 198.993967,
@@ -26,7 +26,7 @@
       "seconds": 0.308565398
     },
     "pipeline": "propose; independent approve and check report; merge_batch",
-    "proposals_from": "o5s CLI processes in per-agent Git repositories",
+    "proposals_from": "o1s CLI processes in per-agent Git repositories",
     "propose": {
       "failed": 0,
       "max_ms": 199.25707500000001,
@@ -37,7 +37,7 @@
       "requests": 1000,
       "seconds": 1.700838222
     },
-    "system": "o5s",
+    "system": "o1s",
     "transport": "HTTP over loopback"
   },
   "settings": {

@@ -8,10 +8,10 @@ database then holds the encoding of the state `applyAll` computes. This file
 gives the registry's encoding and table writes, and checks them against
 `applyWrite`.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Schema H5iAppLib H5iAppLib.Sql
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Schema H5iAppLib H5iAppLib.Sql
   H5iAppLib.Store
 
-namespace o5s_registry.Storage
+namespace o1s_registry.Storage
 
 /-- A state's rows, table by table, numbered like `schema!`. -/
 def enc (s : St) : Tables Val
@@ -75,4 +75,4 @@ theorem stored {db : Db Val} {s : St} (h : Served app Snapshot.toSt db s) :
       ∀ r, Lists kl db (Rows.tabs r) → decode r ⦃ o => ∃ snap, o = some snap ∧ app.Equiv (Snapshot.toSt snap) s ⦄ :=
   Schema.stored fits sql_fits h
 
-end o5s_registry.Storage
+end o1s_registry.Storage

@@ -1,6 +1,6 @@
-//! The o5s API on Cloudflare Workers. The registry kernel, command planning,
+//! The o1s API on Cloudflare Workers. The registry kernel, command planning,
 //! narrow loads and repository views are the same crates the native server
-//! runs (`o5s_pgwire::service`); this crate binds them to Hyperdrive and to
+//! runs (`o1s_pgwire::service`); this crate binds them to Hyperdrive and to
 //! the Workers fetch handler. Git export pushes snapshots to Cloudflare
 //! Artifacts (`artifacts.rs`), where agent workspaces live as well.
 
@@ -17,11 +17,11 @@ use axum::{
     response::{Html, IntoResponse, Response},
     routing::{get, post},
 };
-use o5s_pgwire::{
+use o1s_pgwire::{
     Connector, DbError, Engine, Runtime,
     service::{Failure, Service},
 };
-use o5s_platform::{Actor, Command, IncrementalView, Refusal, Repository};
+use o1s_platform::{Actor, Command, IncrementalView, Refusal, Repository};
 use serde::Deserialize;
 use std::{sync::Arc, time::Duration};
 use tower_service::Service as _;
@@ -31,7 +31,7 @@ use worker::{
 };
 
 /// PostgreSQL schema of the registry tables, as the native server uses.
-pub const SCHEMA: &str = "o5s";
+pub const SCHEMA: &str = "o1s";
 
 /// A new connection through Hyperdrive, which pools the real ones.
 pub struct Hyper(Hyperdrive);
@@ -77,7 +77,7 @@ struct AppState {
 }
 
 /// The registry over Hyperdrive. Admissions record their channel's stale
-/// projection in the same transaction (`o5s_pgwire::outbox`).
+/// projection in the same transaction (`o1s_pgwire::outbox`).
 fn registry(env: &Env) -> Result<Registry, Failure> {
     let hyperdrive = env
         .hyperdrive("HYPERDRIVE")
@@ -117,7 +117,7 @@ impl AppState {
                 .engine
                 .revoked(tenant, user, exp, &token)
                 .await
-                .map_err(o5s_pgwire::service::unavailable)
+                .map_err(o1s_pgwire::service::unavailable)
         }
         .await;
         match revoked {
@@ -144,24 +144,24 @@ fn bearer(headers: &HeaderMap) -> String {
 /// one after probing that its repository has not changed, so it loads only
 /// the rows committed since instead of the whole repository. Bounded, since
 /// an isolate has 128 MB.
-fn views() -> &'static Arc<o5s_pgwire::service::Cache> {
-    static VIEWS: std::sync::OnceLock<Arc<o5s_pgwire::service::Cache>> = std::sync::OnceLock::new();
-    VIEWS.get_or_init(|| Arc::new(o5s_pgwire::service::Cache::new(8)))
+fn views() -> &'static Arc<o1s_pgwire::service::Cache> {
+    static VIEWS: std::sync::OnceLock<Arc<o1s_pgwire::service::Cache>> = std::sync::OnceLock::new();
+    VIEWS.get_or_init(|| Arc::new(o1s_pgwire::service::Cache::new(8)))
 }
 
 /// Per isolate: requests reach many isolates, so the rate limit is per
 /// isolate, not global.
-fn rate() -> &'static o5s_platform::limits::RateLimiter {
-    static RATE: std::sync::OnceLock<o5s_platform::limits::RateLimiter> =
+fn rate() -> &'static o1s_platform::limits::RateLimiter {
+    static RATE: std::sync::OnceLock<o1s_platform::limits::RateLimiter> =
         std::sync::OnceLock::new();
     RATE.get_or_init(Default::default)
 }
 
 fn router(env: Env, ctx: Context) -> Router {
     if let Ok(limits) =
-        o5s_platform::limits::Limits::from_lookup(|k| env.var(k).ok().map(|v| v.to_string()))
+        o1s_platform::limits::Limits::from_lookup(|k| env.var(k).ok().map(|v| v.to_string()))
     {
-        o5s_platform::limits::set(limits);
+        o1s_platform::limits::set(limits);
     }
     let state = AppState {
         env: Arc::new(env),
@@ -229,7 +229,7 @@ async fn sweep(env: &Env) -> Result<(), Failure> {
         .engine
         .pending_exports(25)
         .await
-        .map_err(o5s_pgwire::service::unavailable)?;
+        .map_err(o1s_pgwire::service::unavailable)?;
     for p in pending {
         let a = Actor {
             tenant: p.outbox.org,
@@ -251,7 +251,7 @@ async fn sweep(env: &Env) -> Result<(), Failure> {
                 .engine
                 .exported(&p.outbox, generation)
                 .await
-                .map_err(o5s_pgwire::service::unavailable)?;
+                .map_err(o1s_pgwire::service::unavailable)?;
         }
     }
     Ok(())
@@ -356,11 +356,11 @@ async fn command(State(s): State<AppState>, headers: HeaderMap, body: Bytes) -> 
             serde_json::json!({"error":"too many commands; retry later"}),
         );
     }
-    if matches!(c, Command::Create { .. }) && o5s_platform::limits::get().max_repositories.is_some()
+    if matches!(c, Command::Create { .. }) && o1s_platform::limits::get().max_repositories.is_some()
     {
         let count = async { s.registry()?.repositories(&a).await }.await;
         if let Err(e) = count.and_then(|n| {
-            o5s_platform::limits::check_repositories(n.len()).map_err(Failure::Refused)
+            o1s_platform::limits::check_repositories(n.len()).map_err(Failure::Refused)
         }) {
             return reply(Err(e));
         }
@@ -378,7 +378,7 @@ async fn command(State(s): State<AppState>, headers: HeaderMap, body: Bytes) -> 
     {
         let env = s.env.clone();
         s.ctx.wait_until(async move {
-            let outbox = o5s_pgwire::outbox::Outbox {
+            let outbox = o1s_pgwire::outbox::Outbox {
                 org: a.tenant,
                 repo: repo.clone(),
                 channel: channel.clone(),
@@ -445,7 +445,7 @@ async fn export(State(s): State<AppState>, headers: HeaderMap, body: Bytes) -> R
             );
         }
     };
-    if !o5s_platform::valid_name(&q.channel) {
+    if !o1s_platform::valid_name(&q.channel) {
         return reply(Err(Failure::Refused(Refusal(
             "invalid channel name".into(),
         ))));
@@ -546,7 +546,7 @@ async fn patch_snapshot(
     };
     reply(
         repo.materialize_patch(q.patch)
-            .map(|view| o5s_platform::snapshot_json(&repo, q.patch, &view))
+            .map(|view| o1s_platform::snapshot_json(&repo, q.patch, &view))
             .map_err(Failure::Refused),
     )
 }
@@ -572,7 +572,7 @@ async fn document_view(
         Err(e) => return e,
     };
     reply((|| {
-        if !o5s_platform::valid_path(&q.path) {
+        if !o1s_platform::valid_path(&q.path) {
             return Err(Refusal("invalid document path".into()));
         }
         let selected: Vec<u64> = match &q.patches {
@@ -716,7 +716,7 @@ async fn artifacts_access(
     }
 }
 
-/// The caller's workspace: the channel's snapshot on `o5s/<channel>` of an
+/// The caller's workspace: the channel's snapshot on `o1s/<channel>` of an
 /// Artifacts repository only this user is given write tokens for.
 #[worker::send]
 async fn worktree(State(s): State<AppState>, headers: HeaderMap, body: Bytes) -> Response {
@@ -733,7 +733,7 @@ async fn worktree(State(s): State<AppState>, headers: HeaderMap, body: Bytes) ->
             );
         }
     };
-    if !o5s_platform::valid_name(&q.channel) {
+    if !o1s_platform::valid_name(&q.channel) {
         return reply(Err(Failure::Refused(Refusal(
             "invalid channel name".into(),
         ))));
@@ -803,7 +803,7 @@ async fn worktree_propose(State(s): State<AppState>, headers: HeaderMap, body: B
             );
         }
     };
-    if !o5s_platform::valid_name(&q.channel) || !artifacts::valid_branch(&q.branch) {
+    if !o1s_platform::valid_name(&q.channel) || !artifacts::valid_branch(&q.branch) {
         return reply(Err(Failure::Refused(Refusal(
             "invalid channel or branch name".into(),
         ))));
@@ -820,7 +820,7 @@ async fn worktree_propose(State(s): State<AppState>, headers: HeaderMap, body: B
                 "the branch does not start from that snapshot".into(),
             )));
         }
-        let command = o5s_platform::workspace::proposal(
+        let command = o1s_platform::workspace::proposal(
             &q.repo, &q.channel, &q.intent, &message, &repo, edits,
         )
         .map_err(Failure::Refused)?;
@@ -864,7 +864,7 @@ async fn revoke_token(State(s): State<AppState>, headers: HeaderMap, body: Bytes
             }
         }
     };
-    use o5s_pgwire::revoke::{Revocation, digest};
+    use o1s_pgwire::revoke::{Revocation, digest};
     let r = if all {
         Revocation::User {
             tenant,
@@ -882,7 +882,7 @@ async fn revoke_token(State(s): State<AppState>, headers: HeaderMap, body: Bytes
             .engine
             .revoke(&r)
             .await
-            .map_err(o5s_pgwire::service::unavailable)
+            .map_err(o1s_pgwire::service::unavailable)
     }
     .await;
     reply(done.map(|()| serde_json::json!({"revoked":r})))

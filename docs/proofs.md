@@ -8,7 +8,7 @@ New statements are first written against the extracted code outside the gate; on
 
 | Decision | Extracted function | Caller |
 |---|---|---|
-| Every registry commit: repository directory, patch registration, reviews, check reports, forks, admission | `o5s_registry::transition`, `commit` | both storage engines, native server and Worker |
+| Every registry commit: repository directory, patch registration, reviews, check reports, forks, admission | `o1s_registry::transition`, `commit` | both storage engines, native server and Worker |
 | Admission of one patch | `patch::merge` | the registry kernel |
 | Validating, committing and materializing a graph document | `document::validate`, `commit`, `materialize` | `model::DocumentGraph` (the native adapter interns identities) |
 | Graph dependencies and nearest file heads of a proposal | `causality::frontier` | `documents::nearest`, `dependencies` |

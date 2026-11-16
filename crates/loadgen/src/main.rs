@@ -1,6 +1,6 @@
-//! Closed-loop load for o5s and a plain-Git baseline on the same workloads.
+//! Closed-loop load for o1s and a plain-Git baseline on the same workloads.
 //!
-//! `o5s` drives a running server over its authenticated HTTP API with
+//! `o1s` drives a running server over its authenticated HTTP API with
 //! persistent connections: every author proposes concurrently, an independent
 //! reviewer and check reporter report on every proposal, and patches are
 //! admitted in batches. `git` runs the same edits as agents with their own
@@ -8,20 +8,20 @@
 //! runs both and prints one report. Final contents are checked in every mode.
 //!
 //! ```sh
-//! H5I_APP_SECRET=... o5s-load compare --url http://127.0.0.1:3000 --agents 1000 --concurrency 64 --workload disjoint
+//! H5I_APP_SECRET=... o1s-load compare --url http://127.0.0.1:3000 --agents 1000 --concurrency 64 --workload disjoint
 //! ```
 //!
 //! `history` times single operations as one repository's history grows
 //! (`history.rs`):
 //!
 //! ```sh
-//! H5I_APP_SECRET=... o5s-load history --url http://127.0.0.1:3000 --sizes 1000,10000 --shape chain
+//! H5I_APP_SECRET=... o1s-load history --url http://127.0.0.1:3000 --sizes 1000,10000 --shape chain
 //! ```
 mod git;
 mod history;
 
 use futures::{StreamExt, stream};
-use o5s_server::auth::HmacAuth;
+use o1s_server::auth::HmacAuth;
 use serde_json::{Value, json};
 use std::time::{Duration, Instant};
 
@@ -33,7 +33,7 @@ pub struct Work {
     pub batch: usize,
     /// Lines between edited lines in `disjoint` (1 = adjacent lines).
     pub spacing: u64,
-    /// Propose through this `o5s` CLI in per-agent Git repositories.
+    /// Propose through this `o1s` CLI in per-agent Git repositories.
     pub cli: Option<std::path::PathBuf>,
     /// Open loop: proposals arrive at this rate (per second) whatever the
     /// server's latency, instead of `concurrency` closed-loop clients.
@@ -197,7 +197,7 @@ where
     (s, started.elapsed().as_secs_f64(), values)
 }
 
-async fn o5s(w: &Work, url: &str, tenant: u64) -> Value {
+async fn o1s(w: &Work, url: &str, tenant: u64) -> Value {
     let secret = std::env::var("H5I_APP_SECRET").expect("H5I_APP_SECRET must sign test tokens");
     let http = reqwest::Client::builder()
         .pool_max_idle_per_host(w.concurrency)
@@ -267,7 +267,7 @@ async fn o5s(w: &Work, url: &str, tenant: u64) -> Value {
     // admitted snapshot (setup, not measured).
     let agent_dir = |i: u64| {
         std::env::temp_dir()
-            .join(format!("o5s-cli-{run}"))
+            .join(format!("o1s-cli-{run}"))
             .join(format!("agent-{i}"))
     };
     if let Some(cli) = &w.cli {
@@ -285,7 +285,7 @@ async fn o5s(w: &Work, url: &str, tenant: u64) -> Value {
                     run_in(
                         &dir,
                         "git",
-                        &["checkout", "-q", "--detach", "refs/o5s/main"],
+                        &["checkout", "-q", "--detach", "refs/o1s/main"],
                         &token,
                         url,
                     )
@@ -348,7 +348,7 @@ async fn o5s(w: &Work, url: &str, tenant: u64) -> Value {
         None => phase(w.concurrency, (0..w.agents).collect(), propose_one).await,
     };
     if w.cli.is_some() {
-        let _ = std::fs::remove_dir_all(std::env::temp_dir().join(format!("o5s-cli-{run}")));
+        let _ = std::fs::remove_dir_all(std::env::temp_dir().join(format!("o1s-cli-{run}")));
     }
     let ids: Vec<(String, u64)> = replies
         .iter()
@@ -443,8 +443,8 @@ async fn o5s(w: &Work, url: &str, tenant: u64) -> Value {
     }
     let failed = proposals.failed + reviews.failed + merges.failed;
     json!({
-        "system": "o5s", "transport": "HTTP over loopback",
-        "proposals_from": if w.cli.is_some() { "o5s CLI processes in per-agent Git repositories" } else { "HTTP API" },
+        "system": "o1s", "transport": "HTTP over loopback",
+        "proposals_from": if w.cli.is_some() { "o1s CLI processes in per-agent Git repositories" } else { "HTTP API" },
         "pipeline": "propose; independent approve and check report; merge_batch",
         "offered_proposals_per_second": w.rate,
         "propose": proposals.report(proposal_s), "approve_and_check": reviews.report(review_s),
@@ -467,8 +467,8 @@ async fn run_in(
     let out = tokio::process::Command::new(program)
         .args(args)
         .current_dir(dir)
-        .env("O5S_URL", url)
-        .env("O5S_TOKEN", token)
+        .env("O1S_URL", url)
+        .env("O1S_TOKEN", token)
         .env("HOME", dir)
         .env("GIT_TERMINAL_PROMPT", "0")
         .output()
@@ -508,7 +508,7 @@ async fn main() {
     let mode = if v.first().is_some_and(|m| !m.starts_with("--")) {
         v.remove(0)
     } else {
-        "o5s".into()
+        "o1s".into()
     };
     let mut w = Work {
         workload: "disjoint".into(),
@@ -553,12 +553,12 @@ async fn main() {
         "unknown workload"
     );
     let dir = dir.unwrap_or_else(|| {
-        std::env::temp_dir().join(format!("o5s-git-baseline-{}", std::process::id()))
+        std::env::temp_dir().join(format!("o1s-git-baseline-{}", std::process::id()))
     });
     let settings = json!({"workload": w.workload, "agents": w.agents, "concurrency": w.concurrency,
         "batch": w.batch, "spacing": w.spacing, "cli": w.cli.is_some(), "rate": w.rate});
     let report = match mode.as_str() {
-        "o5s" => json!({"settings": settings, "o5s": o5s(&w, &url, tenant).await}),
+        "o1s" => json!({"settings": settings, "o1s": o1s(&w, &url, tenant).await}),
         "git" => json!({"settings": settings, "git": git::run(&w, &dir).await}),
         "history" => {
             let secret =
@@ -573,15 +573,15 @@ async fn main() {
         }
         "compare" => {
             let g = git::run(&w, &dir).await;
-            let o = o5s(&w, &url, tenant).await;
+            let o = o1s(&w, &url, tenant).await;
             eprintln!("{}\n{}", summary(&g), summary(&o));
-            json!({"settings": settings, "git": g, "o5s": o})
+            json!({"settings": settings, "git": g, "o1s": o})
         }
-        other => panic!("unknown mode {other}: o5s, git, compare or history"),
+        other => panic!("unknown mode {other}: o1s, git, compare or history"),
     };
     let _ = std::fs::remove_dir_all(&dir);
     println!("{}", serde_json::to_string_pretty(&report).unwrap());
-    let failed = report["o5s"]["failed"].as_u64().unwrap_or(0);
+    let failed = report["o1s"]["failed"].as_u64().unwrap_or(0);
     if failed != 0 {
         std::process::exit(1);
     }

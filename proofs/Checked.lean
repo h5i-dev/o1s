@@ -1,6 +1,6 @@
 import Rendering
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Checked
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Checked
 open Rendering
 abbrev State := Bool × Nat × Nat
 def abs (s : interval.Validation) : State := (s.valid, s.cursor.val, s.capacity.val)
@@ -119,4 +119,4 @@ theorem good_next (n cursor budget : Nat) (cs : List Chunk)
     have room := good_budget _ _ _ _ hg
     h5i_step
 
-end o5s_kernel.Checked
+end o1s_kernel.Checked

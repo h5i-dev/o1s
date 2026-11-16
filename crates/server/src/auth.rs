@@ -10,7 +10,7 @@
 use axum::http::{HeaderMap, Method};
 
 /// Derives the key read-only tokens are signed with.
-const READ_ONLY: &[u8] = b"o5s read-only token key";
+const READ_ONLY: &[u8] = b"o1s read-only token key";
 
 #[derive(Debug)]
 pub struct AuthError(pub String);
@@ -101,7 +101,7 @@ impl HmacAuth {
     /// Length and a short HMAC fingerprint of the secret, to compare with
     /// `admin fingerprint` when tokens fail to verify. Reveals neither.
     pub fn fingerprint(&self) -> String {
-        let tag = self.tag(b"o5s-secret-check");
+        let tag = self.tag(b"o1s-secret-check");
         let hex: String = tag.iter().take(6).map(|b| format!("{b:02x}")).collect();
         format!("{} bytes, {hex}", self.secret.len())
     }

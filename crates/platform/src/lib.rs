@@ -2,17 +2,17 @@
 //!
 //! Every registry decision (repository directory, immutable patch identity,
 //! independent review and check facts, channel forks and dependency-closed
-//! admission) is made by the extracted `o5s_registry::transition`. This crate
+//! admission) is made by the extracted `o1s_registry::transition`. This crate
 //! prepares kernel commands natively (SHA-256 identities and line/graph edits
 //! validated against immutable dependencies), projects committed kernel rows
 //! into repository views, and materializes files and conflicts. Hashing,
 //! preparation and materialization belong to the tested trust boundary.
-use o5s_registry as kernel;
+use o1s_registry as kernel;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 
-pub use o5s_registry::REPOSITORY_SCOPE;
+pub use o1s_registry::REPOSITORY_SCOPE;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Edit {
@@ -313,7 +313,7 @@ pub fn describe(error: kernel::Error) -> &'static str {
 /// the stored organization and name differ, so a collision cannot leak data.
 pub fn repository_key(tenant: u64, name: &str) -> u64 {
     let digest = Sha256::new()
-        .chain_update(b"o5s-repository-v1\0")
+        .chain_update(b"o1s-repository-v1\0")
         .chain_update(tenant.to_be_bytes())
         .chain_update(name.as_bytes())
         .finalize();
@@ -1182,7 +1182,7 @@ impl Repository {
         }
         let rows = documents::rows(self);
         let found =
-            o5s_kernel::indexed::reachable(&rows, &vec![id as usize], vec![false; rows.len()]);
+            o1s_kernel::indexed::reachable(&rows, &vec![id as usize], vec![false; rows.len()]);
         let mut pending: Vec<u64> = found.queue.into_iter().map(|h| h as u64).collect();
         pending.sort_unstable();
         let mut cache = IncrementalView::default();
@@ -1344,7 +1344,7 @@ pub struct IncrementalView {
     outputs: BTreeMap<String, PathOutput>,
     /// Graph documents by identity, and the identity each edit resolves to.
     docs: documents::Docs,
-    documents: BTreeMap<documents::DocId, o5s_kernel::model::DocumentGraph>,
+    documents: BTreeMap<documents::DocId, o1s_kernel::model::DocumentGraph>,
     /// State heads (exists, executable) of each graph document.
     document_heads: BTreeMap<documents::DocId, BTreeMap<u64, documents::FileState>>,
     /// Location heads (path) of each graph document.

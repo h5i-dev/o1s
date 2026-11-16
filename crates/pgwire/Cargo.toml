@@ -1,14 +1,14 @@
 [package]
-name = "o5s-pgwire"
+name = "o1s-pgwire"
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
 publish = false
-description = "The o5s registry on PostgreSQL for native servers and Cloudflare Workers"
+description = "The o1s registry on PostgreSQL for native servers and Cloudflare Workers"
 
 [dependencies]
-o5s-platform = { path = "../platform" }
-o5s-registry = { path = "../registry", features = ["serde"] }
+o1s-platform = { path = "../platform" }
+o1s-registry = { path = "../registry", features = ["serde"] }
 h5i-app-sql = "0.1.1"
 h5i-app-pgsql = "0.1.1"
 tokio-postgres = { version = "0.7", default-features = false }

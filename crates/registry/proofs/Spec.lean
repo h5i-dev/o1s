@@ -1,4 +1,4 @@
-import O5sRegistry
+import O1sRegistry
 import Schema
 import H5iAppLib
 /-!
@@ -8,9 +8,9 @@ The registry's state as plain lists, and what each write does to it. Every
 write is a keyed put (`H5iAppLib.upsert`) or replaces the repository row;
 nothing is ever deleted.
 -/
-open Aeneas Aeneas.Std o5s_registry H5iAppLib
+open Aeneas Aeneas.Std o1s_registry H5iAppLib
 
-namespace o5s_registry.Spec
+namespace o1s_registry.Spec
 
 /-- One tenant's rows: a repository or an organization directory. -/
 structure St where
@@ -51,4 +51,4 @@ def applyAll (s : St) (ws : List Write) : St := ws.foldl applyWrite s
 /-- A fresh tenant. -/
 def init : St := ⟨Schema.Repository.zero, [], [], [], [], [], [], [], [], [], [], []⟩
 
-end o5s_registry.Spec
+end o1s_registry.Spec

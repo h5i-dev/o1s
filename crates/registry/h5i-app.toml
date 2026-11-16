@@ -4,28 +4,28 @@
 crate = "."
 start-from = ["transition", "apply", "commit", "sql_writes", "decode", "visible"]
 schema = true
-include = ["h5i_app_sql", "h5i_app_std", "o5s_kernel"]
+include = ["h5i_app_sql", "h5i_app_std", "o1s_kernel"]
 std-specs = true
 
 [check]
 # Must exist and use only the standard axioms (every theorem in a hand-written
 # module is gated as well).
 theorems = [
-  "o5s_registry.ApplyProofs.apply_spec",
-  "o5s_registry.ApplyProofs.commit_spec",
-  "o5s_registry.Storage.stored",
-  "o5s_registry.Refine.transition_refines",
-  "o5s_registry.Guarantees.isolation",
-  "o5s_registry.Guarantees.scopes_separate",
-  "o5s_registry.Guarantees.merge_gate",
-  "o5s_registry.Guarantees.frame",
-  "o5s_registry.Invariant.inv_preserved",
-  "o5s_registry.Invariant.reachable_inv",
-  "o5s_registry.Invariant.patches_immutable",
-  "o5s_registry.Invariant.members_append_only",
-  "o5s_registry.Narrow.narrow_load",
-  "o5s_registry.Served.pg_load_narrow",
-  "o5s_registry.Served.pg_served",
-  "o5s_registry.Group.group_served",
-  "o5s_registry.Group.defer_repo",
+  "o1s_registry.ApplyProofs.apply_spec",
+  "o1s_registry.ApplyProofs.commit_spec",
+  "o1s_registry.Storage.stored",
+  "o1s_registry.Refine.transition_refines",
+  "o1s_registry.Guarantees.isolation",
+  "o1s_registry.Guarantees.scopes_separate",
+  "o1s_registry.Guarantees.merge_gate",
+  "o1s_registry.Guarantees.frame",
+  "o1s_registry.Invariant.inv_preserved",
+  "o1s_registry.Invariant.reachable_inv",
+  "o1s_registry.Invariant.patches_immutable",
+  "o1s_registry.Invariant.members_append_only",
+  "o1s_registry.Narrow.narrow_load",
+  "o1s_registry.Served.pg_load_narrow",
+  "o1s_registry.Served.pg_served",
+  "o1s_registry.Group.group_served",
+  "o1s_registry.Group.defer_repo",
 ]

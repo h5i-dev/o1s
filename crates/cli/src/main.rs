@@ -1,4 +1,4 @@
-//! Git remains the working-copy interface. o5s coordinates immutable proposals.
+//! Git remains the working-copy interface. o1s coordinates immutable proposals.
 use clap::{Parser, Subcommand};
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
@@ -15,14 +15,14 @@ type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 #[derive(Parser)]
 #[command(
-    name = "o5s",
+    name = "o1s",
     version,
     about = "Patch collaboration for ordinary Git repositories and worktrees"
 )]
 struct Cli {
-    #[arg(long, global = true, env = "O5S_URL")]
+    #[arg(long, global = true, env = "O1S_URL")]
     url: Option<String>,
-    #[arg(long, global = true, env = "O5S_PROFILE", default_value = "default")]
+    #[arg(long, global = true, env = "O1S_PROFILE", default_value = "default")]
     profile: String,
     #[arg(long, global = true)]
     compact: bool,
@@ -38,7 +38,7 @@ enum Action {
     },
     /// Remove this profile's saved token.
     Logout,
-    /// Attach this existing Git repository to an o5s collaboration repository.
+    /// Attach this existing Git repository to an o1s collaboration repository.
     Connect { repository: String },
     /// Show local changes, remote conflicts and the snapshot this worktree builds on.
     Status {
@@ -139,7 +139,7 @@ enum Action {
         #[arg(long, default_value = "main")]
         channel: String,
     },
-    /// Fetch a conflict-free snapshot into refs/o5s/CHANNEL; never changes HEAD or files.
+    /// Fetch a conflict-free snapshot into refs/o1s/CHANNEL; never changes HEAD or files.
     Fetch {
         #[arg(long, default_value = "main")]
         channel: String,
@@ -250,7 +250,7 @@ fn run_command(command: &str, dir: &Path, timeout: u64) -> Result<bool> {
         .arg(command)
         .current_dir(dir)
         .stdin(Stdio::null())
-        .env("O5S_SNAPSHOT", dir)
+        .env("O1S_SNAPSHOT", dir)
         .spawn()?;
     let deadline = std::time::Instant::now() + Duration::from_secs(timeout);
     loop {
@@ -260,14 +260,14 @@ fn run_command(command: &str, dir: &Path, timeout: u64) -> Result<bool> {
         if std::time::Instant::now() >= deadline {
             let _ = child.kill();
             let _ = child.wait();
-            eprintln!("o5s ci: timed out after {timeout} s");
+            eprintln!("o1s ci: timed out after {timeout} s");
             return Ok(false);
         }
         std::thread::sleep(Duration::from_millis(100));
     }
 }
 
-/// `o5s ci`: execute checks on patch snapshots and report them.
+/// `o1s ci`: execute checks on patch snapshots and report them.
 fn run_checks(
     api: &Api,
     git: &Git,
@@ -276,7 +276,7 @@ fn run_checks(
     only: Option<u64>,
     timeout: u64,
 ) -> Result<Value> {
-    let path = git.common.join("o5s/ci.json");
+    let path = git.common.join("o1s/ci.json");
     let mut log: CiLog = match fs::read(&path) {
         Ok(b) => serde_json::from_slice(&b)?,
         Err(_) => CiLog::default(),
@@ -318,7 +318,7 @@ fn run_checks(
             None,
         )?;
         let dir = std::env::temp_dir().join(format!(
-            "o5s-ci-{}-{patch}-{}",
+            "o1s-ci-{}-{patch}-{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)?
@@ -328,7 +328,7 @@ fn run_checks(
         let passed = match write_snapshot(&dir, &snapshot) {
             Ok(()) => run_command(command, &dir, timeout)?,
             Err(e) => {
-                eprintln!("o5s ci: patch {patch}: {e}");
+                eprintln!("o1s ci: patch {patch}: {e}");
                 false
             }
         };
@@ -398,7 +398,7 @@ fn origin(s: &str) -> Result<String> {
 impl Api {
     fn new(url: String, token: String) -> Result<Self> {
         if token.trim().is_empty() {
-            return Err(error("Missing token: set O5S_TOKEN or run o5s login"));
+            return Err(error("Missing token: set O1S_TOKEN or run o1s login"));
         }
         Ok(Self {
             client: Client::builder()
@@ -450,14 +450,14 @@ impl Api {
     }
 }
 fn config_path() -> Result<PathBuf> {
-    if let Some(p) = std::env::var_os("O5S_CONFIG") {
+    if let Some(p) = std::env::var_os("O1S_CONFIG") {
         return Ok(p.into());
     }
     let base = std::env::var_os("XDG_CONFIG_HOME")
         .map(PathBuf::from)
         .or_else(|| std::env::var_os("HOME").map(|p| PathBuf::from(p).join(".config")))
-        .ok_or("Set O5S_CONFIG or XDG_CONFIG_HOME")?;
-    Ok(base.join("o5s/config.json"))
+        .ok_or("Set O1S_CONFIG or XDG_CONFIG_HOME")?;
+    Ok(base.join("o1s/config.json"))
 }
 fn profiles() -> Result<Profiles> {
     let path = config_path()?;
@@ -474,7 +474,7 @@ fn save<T: Serialize>(path: &Path, value: &T) -> Result<()> {
         .unwrap_or(Path::new("."));
     fs::create_dir_all(parent)?;
     let tmp = parent.join(format!(
-        ".o5s-{}-{}.tmp",
+        ".o1s-{}-{}.tmp",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)?
@@ -518,12 +518,12 @@ impl Git {
         raw_git(Some(&self.root), args, input)
     }
     fn context_path(&self) -> PathBuf {
-        self.common.join("o5s/context.json")
+        self.common.join("o1s/context.json")
     }
     fn context(&self) -> Result<Context> {
         let bytes = fs::read(self.context_path()).map_err(|e| {
             error(format!(
-                "No o5s connection for this Git repository ({e}); run o5s connect NAME"
+                "No o1s connection for this Git repository ({e}); run o1s connect NAME"
             ))
         })?;
         Ok(serde_json::from_slice(&bytes)?)
@@ -547,7 +547,7 @@ impl Git {
             .ok_or("Unknown channel")?;
         if !members.is_empty() {
             return Err(error(
-                "HEAD has no known o5s snapshot. Run o5s fetch, then use git switch or git worktree add with refs/o5s/CHANNEL; local files will not be overwritten.",
+                "HEAD has no known o1s snapshot. Run o1s fetch, then use git switch or git worktree add with refs/o1s/CHANNEL; local files will not be overwritten.",
             ));
         }
         Ok((
@@ -693,7 +693,7 @@ impl Git {
             .is_empty()
         {
             return Err(error(
-                "Snapshot has conflicts; inspect o5s view and propose a resolution before fetching",
+                "Snapshot has conflicts; inspect o1s view and propose a resolution before fetching",
             ));
         }
         let texts: BTreeMap<String, String> =
@@ -732,7 +732,7 @@ impl Git {
         {
             return Err(error("Invalid channel name"));
         }
-        let reference = format!("refs/o5s/{channel}");
+        let reference = format!("refs/o1s/{channel}");
         let old = self
             .run(&["rev-parse", "--verify", &reference], None)
             .ok()
@@ -784,7 +784,7 @@ impl Git {
             args.extend(["-p", p.as_str()]);
         }
         let msg = format!(
-            "o5s {} / {channel}\n\nPatch handles: {}\n",
+            "o1s {} / {channel}\n\nPatch handles: {}\n",
             context.repository,
             patches
                 .iter()
@@ -943,10 +943,10 @@ fn raw_git(root: Option<&Path>, args: &[&str], input: Option<&[u8]>) -> Result<V
     }
     let mut child = cmd
         .args(args)
-        .env("GIT_AUTHOR_NAME", "o5s")
-        .env("GIT_AUTHOR_EMAIL", "o5s@localhost")
-        .env("GIT_COMMITTER_NAME", "o5s")
-        .env("GIT_COMMITTER_EMAIL", "o5s@localhost")
+        .env("GIT_AUTHOR_NAME", "o1s")
+        .env("GIT_AUTHOR_EMAIL", "o1s@localhost")
+        .env("GIT_COMMITTER_NAME", "o1s")
+        .env("GIT_COMMITTER_EMAIL", "o1s@localhost")
         .stdin(if input.is_some() {
             Stdio::piped()
         } else {
@@ -1097,7 +1097,7 @@ fn graph_operations(document: &Value, original: &str, updated: &str) -> Result<V
             .any(|layer| layer.as_array().is_none_or(|ids| ids.len() != 1))
     {
         return Err(error(
-            "Graph document has unresolved conflicts; inspect o5s document and submit explicit reviewed operations",
+            "Graph document has unresolved conflicts; inspect o1s document and submit explicit reviewed operations",
         ));
     }
     let rendered: Vec<u8> = serde_json::from_value(document["bytes"].clone())
@@ -1423,13 +1423,13 @@ fn execute(cli: &Cli) -> Result<Value> {
     }
     let git = Git::discover()?;
     // Native Git worktrees share snapshot metadata and remote refs.
-    fs::create_dir_all(git.common.join("o5s"))?;
+    fs::create_dir_all(git.common.join("o1s"))?;
     let lock = fs::OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
         .truncate(false)
-        .open(git.common.join("o5s/context.lock"))?;
+        .open(git.common.join("o1s/context.lock"))?;
     fs2::FileExt::lock_exclusive(&lock)?;
     let existing = if matches!(cli.command, Action::Connect { .. }) {
         None
@@ -1443,10 +1443,10 @@ fn execute(cli: &Cli) -> Result<Value> {
         .or_else(|| existing.as_ref().map(|c| c.url.clone()))
         .or_else(|| profile.map(|p| p.url.clone()))
         .unwrap_or("http://127.0.0.1:3000".into());
-    let token = match std::env::var("O5S_TOKEN") {
+    let token = match std::env::var("O1S_TOKEN") {
         Ok(token) => token,
         Err(_) => {
-            let profile = profile.ok_or("Set O5S_TOKEN or run o5s login")?;
+            let profile = profile.ok_or("Set O1S_TOKEN or run o1s login")?;
             if origin(&profile.url)? != origin(&url)? {
                 return Err(error(
                     "Saved token belongs to a different origin; select a matching profile",
@@ -1561,7 +1561,7 @@ fn execute(cli: &Cli) -> Result<Value> {
             let state = api.state(repo, channel)?;
             if state["view"]["conflicts"].get(path).is_none() {
                 return Err(error(
-                    "Path has no current conflict; use o5s propose for ordinary edits",
+                    "Path has no current conflict; use o1s propose for ordinary edits",
                 ));
             }
             let content = if *delete {
@@ -1685,7 +1685,7 @@ fn main() {
             }
         ),
         Err(e) => {
-            eprintln!("o5s: {e}");
+            eprintln!("o1s: {e}");
             std::process::exit(1);
         }
     }
@@ -1723,7 +1723,7 @@ mod tests {
     #[test]
     fn graph_commands_parse_explicit_dependencies_and_document_channel() {
         let cli = Cli::try_parse_from([
-            "o5s",
+            "o1s",
             "propose-graph",
             "--operations-file",
             "operations.json",
@@ -1746,13 +1746,13 @@ mod tests {
             _ => panic!("Wrong command"),
         }
         let cli =
-            Cli::try_parse_from(["o5s", "document", "src/main.rs", "--channel", "review"]).unwrap();
+            Cli::try_parse_from(["o1s", "document", "src/main.rs", "--channel", "review"]).unwrap();
         assert!(
             matches!(cli.command, Action::Document { path, channel } if path == "src/main.rs" && channel == "review")
         );
         assert!(
             Cli::try_parse_from([
-                "o5s",
+                "o1s",
                 "propose-graph",
                 "--operations-file",
                 "operations.json"

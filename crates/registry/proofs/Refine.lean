@@ -6,10 +6,10 @@ import Commands
 `transition_refines`: whenever the extracted `transition` returns, its result
 is `Model.step` on the same rows, with write vectors read as lists.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Schema o5s_registry.Helpers
-  o5s_registry.Exact H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Schema o1s_registry.Helpers
+  o1s_registry.Exact H5iAppLib
 
-namespace o5s_registry.Refine
+namespace o1s_registry.Refine
 
 /-- A result with its write vector read as a list. -/
 def lift : core.result.Result (alloc.vec.Vec Write × Reply) Error → Model.Out
@@ -464,14 +464,14 @@ theorem insert_ok (v w : alloc.vec.Vec U64) (x : U64)
     simp only [core.clone.CloneU64, ok.injEq] at ht
     rw [push_ok_val h, ← ht, ho]; subst ho; simp_all
 
-def liftK : core.result.Result (alloc.vec.Vec U64) o5s_kernel.patch.MergeError →
-    core.result.Result (List U64) o5s_kernel.patch.MergeError
+def liftK : core.result.Result (alloc.vec.Vec U64) o1s_kernel.patch.MergeError →
+    core.result.Result (List U64) o1s_kernel.patch.MergeError
   | .Ok v => .Ok v.val
   | .Err e => .Err e
 
 theorem patch_merge_ok (ch deps : alloc.vec.Vec U64) (a c : Bool) (id : U64) (r)
-    (h : o5s_kernel.patch.merge ch deps a c id = ok r) : liftK r = Model.admitK ch.val deps.val a c id := by
-  unfold o5s_kernel.patch.merge at h
+    (h : o1s_kernel.patch.merge ch deps a c id = ok r) : liftK r = Model.admitK ch.val deps.val a c id := by
+  unfold o1s_kernel.patch.merge at h
   h5i_invert h
   all_goals (try have hb' := post_of_ok (h5i_app_std.Specs.set.subset_spec core.cmp.PartialEqU64 _ _) hb)
   · have hsub : (deps.val.all fun d => decide (d ∈ ch.val)) = true := by
@@ -770,4 +770,4 @@ theorem transition_refines (a : Principal) (s : Snapshot) (c : Command) (r)
            | exact merge_refines _ _ _ _ _ h
            | exact grant_refines _ _ _ _ _ h)
 
-end o5s_registry.Refine
+end o1s_registry.Refine

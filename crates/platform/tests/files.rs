@@ -1,5 +1,5 @@
 //! File modes, binary content, empty graph documents, removal and mixed proposals.
-use o5s_platform::*;
+use o1s_platform::*;
 use serde_json::json;
 
 fn actor(user: u64) -> Actor {
@@ -120,7 +120,7 @@ fn plain_text_identities_are_unchanged_by_new_attributes() {
     let reply = run(&mut db, 1, json!({"cmd":"propose","intent":"i","dependencies":[],"edits":[{"path":"a","content":"b"}]})).unwrap();
     let repo = db.repo(&actor(1), "r").unwrap();
     // The pre-attribute encoding: `{"path":..,"content":..}` in field order.
-    let expected = body::hash(br#"["o5s-patch-v1",1,"i",[],[{"path":"a","content":"b"}]]"#);
+    let expected = body::hash(br#"["o1s-patch-v1",1,"i",[],[{"path":"a","content":"b"}]]"#);
     assert_eq!(reply["hash"], expected);
     assert_eq!(repo.patches[&1].hash, expected);
 }

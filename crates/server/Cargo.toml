@@ -1,15 +1,15 @@
 [package]
-name = "o5s-server"
+name = "o1s-server"
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
 publish = false
 
 [dependencies]
-o5s-platform = { path = "../platform" }
-o5s-registry = { path = "../registry", features = ["serde"] }
-o5s-pgwire = { path = "../pgwire", features = ["native"] }
-o5s-gitpush = { path = "../gitpush" }
+o1s-platform = { path = "../platform" }
+o1s-registry = { path = "../registry", features = ["serde"] }
+o1s-pgwire = { path = "../pgwire", features = ["native"] }
+o1s-gitpush = { path = "../gitpush" }
 sha2 = "0.11"
 h5i-app-core = "0.1.1"
 h5i-app-json = "0.1.1"

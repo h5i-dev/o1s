@@ -3,7 +3,7 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
-use o5s_server::{AppState, Backend, Store, auth::HmacAuth, router};
+use o1s_server::{AppState, Backend, Store, auth::HmacAuth, router};
 use std::process::Command;
 use tower::ServiceExt;
 fn state(root: &std::path::Path) -> AppState {
@@ -756,14 +756,14 @@ async fn request_ids_and_metrics_are_reported() {
     let text =
         String::from_utf8(r.into_body().collect().await.unwrap().to_bytes().to_vec()).unwrap();
     assert!(
-        text.contains(r#"o5s_http_requests_total{method="GET",route="/healthz",status="200"} 1"#),
+        text.contains(r#"o1s_http_requests_total{method="GET",route="/healthz",status="200"} 1"#),
         "{text}"
     );
     assert!(
         text.contains(r#"route="/api/repositories",status="200""#),
         "{text}"
     );
-    assert!(text.contains("o5s_local_log_bytes"));
+    assert!(text.contains("o1s_local_log_bytes"));
 }
 
 async fn with_token(

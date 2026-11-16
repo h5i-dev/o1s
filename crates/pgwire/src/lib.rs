@@ -1,11 +1,11 @@
-//! The o5s registry on PostgreSQL, for native servers and Cloudflare Workers.
+//! The o1s registry on PostgreSQL, for native servers and Cloudflare Workers.
 //!
 //! Each command runs in one transaction on one tenant scope:
 //!
 //! ```text
 //! BEGIN ISOLATION LEVEL READ COMMITTED; SET LOCAL search_path TO "schema";
 //! SELECT pg_advisory_xact_lock(scope);
-//! -- idempotency check, narrow loads, o5s_registry::transition, writes
+//! -- idempotency check, narrow loads, o1s_registry::transition, writes
 //! COMMIT
 //! ```
 //!
@@ -29,7 +29,7 @@ pub mod service;
 
 use h5i_app_pgsql::{Column, Kind, Query, Table};
 use h5i_app_sql::{Val, Write};
-use o5s_registry as kernel;
+use o1s_registry as kernel;
 use std::{
     future::Future,
     sync::{
@@ -150,7 +150,7 @@ pub fn tables() -> Vec<Table> {
     let bool_ = |n| col(n, Kind::Bool, false);
     vec![
         table(
-            "o5s_repository",
+            "o1s_repository",
             0,
             vec![
                 int("org"),
@@ -163,34 +163,34 @@ pub fn tables() -> Vec<Table> {
             ],
         ),
         table(
-            "o5s_patches",
+            "o1s_patches",
             1,
             vec![int("id"), bytes("hash"), int("author")],
         ),
-        table("o5s_dependencies", 2, vec![int("patch"), int("dependency")]),
-        table("o5s_approvals", 2, vec![int("patch"), int("reviewer")]),
+        table("o1s_dependencies", 2, vec![int("patch"), int("dependency")]),
+        table("o1s_approvals", 2, vec![int("patch"), int("reviewer")]),
         table(
-            "o5s_checks",
+            "o1s_checks",
             1,
             vec![int("patch"), bool_("passed"), int("reporter")],
         ),
         table(
-            "o5s_channels",
+            "o1s_channels",
             1,
             vec![int("id"), bytes("label"), int("size")],
         ),
         table(
-            "o5s_members",
+            "o1s_members",
             2,
             vec![int("channel"), int("position"), int("patch")],
         ),
         table(
-            "o5s_paths",
+            "o1s_paths",
             1,
             vec![int("id"), bytes("path"), bool_("graph")],
         ),
         table(
-            "o5s_events",
+            "o1s_events",
             1,
             vec![
                 int("seq"),
@@ -200,9 +200,9 @@ pub fn tables() -> Vec<Table> {
                 col("channel", Kind::Int, true),
             ],
         ),
-        table("o5s_bodies", 1, vec![int("patch"), bytes("bytes")]),
-        table("o5s_listings", 1, vec![int("repo"), bytes("label")]),
-        table("o5s_roles", 1, vec![int("user"), int("level")]),
+        table("o1s_bodies", 1, vec![int("patch"), bytes("bytes")]),
+        table("o1s_listings", 1, vec![int("repo"), bytes("label")]),
+        table("o1s_roles", 1, vec![int("user"), int("level")]),
     ]
 }
 
@@ -214,9 +214,9 @@ const IDEMPOTENCY_DDL: &str = "CREATE TABLE IF NOT EXISTS h5i_idempotency (
   PRIMARY KEY (tenant_id, key)
 )";
 
-/// Advisory lock key held while installing the schema ("o5s\0", 1), in the
+/// Advisory lock key held while installing the schema ("o1s\0", 1), in the
 /// two-int key space so it never equals a tenant's bigint lock.
-const SCHEMA_LOCK: (i32, i32) = (0x6f35_7300, 1);
+const SCHEMA_LOCK: (i32, i32) = (0x6f31_7300, 1);
 
 /// `schema` quoted; plain lowercase names only.
 pub fn ident(schema: &str) -> Result<String, DbError> {
@@ -323,7 +323,7 @@ pub struct Engine<C: Connector, R: Runtime> {
     /// on every execution. Off behind transaction-mode poolers (Hyperdrive),
     /// which may run a later transaction on another server connection.
     pub prepared: bool,
-    /// Record each successful admission's channel in `o5s_export_pending`
+    /// Record each successful admission's channel in `o1s_export_pending`
     /// within its transaction (the Worker, which exports after replying).
     pub outbox: bool,
 }

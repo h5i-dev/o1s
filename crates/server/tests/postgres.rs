@@ -1,22 +1,22 @@
-//! PostgreSQL storage, against `O5S_TEST_DATABASE_URL` (skipped when unset).
+//! PostgreSQL storage, against `O1S_TEST_DATABASE_URL` (skipped when unset).
 //! Each test uses its own PostgreSQL schema.
-use o5s_platform::{Actor, Command, Database};
-use o5s_server::{Failure, pg::PgBackend};
+use o1s_platform::{Actor, Command, Database};
+use o1s_server::{Failure, pg::PgBackend};
 
 #[test]
 fn engine_tables_match_the_schema_macro() {
-    assert_eq!(o5s_pgwire::tables(), schema_spec());
+    assert_eq!(o1s_pgwire::tables(), schema_spec());
 }
 
 pub struct Registry;
-o5s_registry::registry_tables!(Registry);
+o1s_registry::registry_tables!(Registry);
 use serde_json::json;
 use std::sync::Arc;
 
 fn url() -> Option<String> {
-    let url = std::env::var("O5S_TEST_DATABASE_URL").ok();
+    let url = std::env::var("O1S_TEST_DATABASE_URL").ok();
     if url.is_none() {
-        eprintln!("O5S_TEST_DATABASE_URL unset; skipping PostgreSQL test");
+        eprintln!("O1S_TEST_DATABASE_URL unset; skipping PostgreSQL test");
     }
     url
 }
@@ -26,11 +26,11 @@ fn schema(name: &str) -> String {
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
         .as_nanos();
-    format!("o5s_test_{name}_{}_{nanos}", std::process::id())
+    format!("o1s_test_{name}_{}_{nanos}", std::process::id())
 }
 
 async fn backend(url: &str, schema: &str) -> PgBackend {
-    o5s_server::pg::connect(url, schema, 8).await.unwrap()
+    o1s_server::pg::connect(url, schema, 8).await.unwrap()
 }
 
 /// Remove a test's schema.
@@ -308,10 +308,10 @@ async fn idempotency_keys_commit_once() {
 async fn admissions_record_stale_projections_until_exported() {
     let Some(url) = url() else { return };
     let schema = schema("outbox");
-    let mut engine = o5s_pgwire::native::connect(&url, &schema, 4).await.unwrap();
+    let mut engine = o1s_pgwire::native::connect(&url, &schema, 4).await.unwrap();
     engine.outbox = true;
     engine.group_commit = true;
-    let pg: PgBackend = o5s_pgwire::service::Service::new(engine);
+    let pg: PgBackend = o1s_pgwire::service::Service::new(engine);
     run(&pg, 1, json!({"cmd":"create","repo":"alpha"})).await;
     let propose = |n: u64| {
         json!({"cmd":"propose","repo":"alpha","intent":format!("p{n}"),"dependencies":[],
@@ -339,7 +339,7 @@ async fn admissions_record_stale_projections_until_exported() {
     assert!(pg.engine.pending_exports(10).await.unwrap().is_empty());
     admit(first).await;
     let pending = pg.engine.pending_exports(10).await.unwrap();
-    let outbox = o5s_pgwire::outbox::Outbox {
+    let outbox = o1s_pgwire::outbox::Outbox {
         org: 1,
         repo: "alpha".into(),
         channel: "main".into(),

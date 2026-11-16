@@ -65,7 +65,7 @@ Measure reference replay, affected-component reconstruction and output separatel
 
 Avoid copying all channel members on each admission. Use indexed membership and shared immutable storage. Keep operation blocks contiguous when their identity and anchors permit it; split a block only at an edited boundary. Compression must preserve reference behavior after later insertion, deletion and restoration.
 
-Evaluate event-graph walking against the reference algorithm on histories with little concurrency and histories with a large active concurrent region. Accept it only if measurements show lower work or memory and the replay semantics remain specified. Do not transfer speedup figures from another library to o5s.
+Evaluate event-graph walking against the reference algorithm on histories with little concurrency and histories with a large active concurrent region. Accept it only if measurements show lower work or memory and the replay semantics remain specified. Do not transfer speedup figures from another library to o1s.
 
 Component-local summaries have a worst case: many live sources can traverse the same deleted interior and create a dense boundary relation. Add fixtures for this case. Use limits and a defined fallback to reference reconstruction when retaining a summary would exceed its budget. A long connected history must not be assumed cheap merely because it is one component.
 
@@ -93,7 +93,7 @@ Completion requires two independently initialized stores exchanging the same pat
 
 ## M7: Git clients, review and snapshot checks
 
-Users create repositories and worktrees with `git init`, `git clone` and `git worktree add`. o5s connects those working copies to a collaboration repository, records proposals and fetches projections into `refs/o5s/*`. Fetching must leave HEAD, the index and working files unchanged. Native Git commands choose when to check out a projection.
+Users create repositories and worktrees with `git init`, `git clone` and `git worktree add`. o1s connects those working copies to a collaboration repository, records proposals and fetches projections into `refs/o1s/*`. Fetching must leave HEAD, the index and working files unchanged. Native Git commands choose when to check out a projection.
 
 Complete CLI coverage for authentication, connection, status, proposal, review, check reports, channel membership, conflicts and resolution. Emit stable JSON and distinct exit codes for authentication, rejected admission, transport failure and local Git errors. Protect saved tokens by origin and tenant. Coordinate metadata shared by native worktrees, and handle cancellation/retry without overwriting user work.
 
@@ -141,10 +141,10 @@ Done in the round of October 11, 2026:
 - **Specs.** Refinement, convergence and loader statements are written in `crates/registry/specs/` (the document statements, now proved, moved into `proofs/`), and type-checked in CI.
 - **Features.**
   - Worker agent workspaces and clone access in Artifacts; the JavaScript adapter is retired.
-  - `o5s ci` runs checks on each proposal's snapshot.
+  - `o1s ci` runs checks on each proposal's snapshot.
   - Symlinks, submodules and identity-preserving moves.
   - Repository roles, token revocation and operator limits (branch `authz`).
-  - Pipelined PostgreSQL commands and group commit (about twice the proposals per second on one hot repository), and an open-loop mode in `o5s-load`.
+  - Pipelined PostgreSQL commands and group commit (about twice the proposals per second on one hot repository), and an open-loop mode in `o1s-load`.
   - A CI workflow covering format, tests with PostgreSQL, the Worker build, the Lean gates and extraction drift.
 
 Done in the round of October 12, 2026:
@@ -154,8 +154,8 @@ Done in the round of October 12, 2026:
 - **Document kernel.** The extracted `document` functions are proved against `DocModel` and gated: validation refuses exactly what the model refuses (`DocRefine.validate_refines`), a validated patch commits (`commit_succeeds`), and the decoded `materialize` result is the specified view (`DocMatRefine.materialize_refines`), so replicas with the same patches converge (`extracted_view_converges`).
 
 - **Deployment.** The `authz` tables were created on PlanetScale and the deployed Worker passed an end-to-end check of roles and token revocation.
-- **Workspaces** (branch `workspace-graph`). Ordinary Git edits of graph documents in a workspace become graph operations, as `o5s propose` makes them, so agents editing different lines of one file merge; before, the kernel refused them. Projection messages and workspace proposals name only the snapshot's causal heads (`causality::heads`, proved in `Heads.heads_keep_past`), not every admitted patch.
-- **History length.** `o5s-load history` times single operations as a repository grows. It found per-request work over the whole history: graph proposals and document reads re-resolved every document identity (O(N²); now memoized per view), the native export started one Git process per file (now one pack), and the Worker rebuilt its repository cache per request (now kept per isolate).
+- **Workspaces** (branch `workspace-graph`). Ordinary Git edits of graph documents in a workspace become graph operations, as `o1s propose` makes them, so agents editing different lines of one file merge; before, the kernel refused them. Projection messages and workspace proposals name only the snapshot's causal heads (`causality::heads`, proved in `Heads.heads_keep_past`), not every admitted patch.
+- **History length.** `o1s-load history` times single operations as a repository grows. It found per-request work over the whole history: graph proposals and document reads re-resolved every document identity (O(N²); now memoized per view), the native export started one Git process per file (now one pack), and the Worker rebuilt its repository cache per request (now kept per isolate).
 
 Next:
 
@@ -165,7 +165,7 @@ Next:
 4. A single hot repository on PostgreSQL saturates near 500 proposals/s with group commit (`docs/load-testing.md`). Multi-row writes would cut the statements per group further.
 5. Multi-host and 10,000-client runs need more than one machine.
 
-The local PostgreSQL 17 development container is `o5s-platform-pg`, bound to `127.0.0.1:15438`; `scripts/postgres.sh` starts an equivalent one.
+The local PostgreSQL 17 development container is `o1s-platform-pg`, bound to `127.0.0.1:15438`; `scripts/postgres.sh` starts an equivalent one.
 
 ## Development and evidence
 

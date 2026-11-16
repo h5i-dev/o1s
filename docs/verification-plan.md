@@ -63,7 +63,7 @@ Platform pieces in `crates/platform/src/documents.rs`:
 ### 1.2 Pure model (Lean, no Aeneas types)
 
 ```lean
-namespace o5s_kernel.DocModel
+namespace o1s_kernel.DocModel
 abbrev PId := Nat                                   -- interned PatchId
 structure OpId  where patch : PId; ordinal : Nat   deriving DecidableEq
 structure NodeId where op : OpId; ordinal : Nat     deriving DecidableEq
@@ -211,7 +211,7 @@ The native adapter then sorts each layer, `blocked` and the conflict list by ext
 ### 2.2 Specification
 
 ```lean
-open o5s_kernel.Projection   -- Segment, Summary, live_reachability
+open o1s_kernel.Projection   -- Segment, Summary, live_reachability
 
 /-- Live-boundary summary: the order relation the materializer actually uses. -/
 def Sum (H : Hist) (u v : Anchor) : Prop :=
@@ -411,7 +411,7 @@ These are input-format checks. The theorems below take their results as hypothes
 ### 4.2 Theorems
 
 ```lean
-open o5s_kernel.Interval   -- Conflict
+open o1s_kernel.Interval   -- Conflict
 
 abbrev Range := Nat × Nat × List UInt8
 def Conf (x y : Range) : Prop := Conflict x.1 x.2.1 y.1 y.2.1

@@ -2,11 +2,11 @@
 
 ## Rust driver
 
-`o5s-load` (`crates/loadgen`) drives a running server over the authenticated API with persistent connections and checks the final bytes. Its `git` and `compare` modes measure the plain-Git baseline on the same workloads; see the [comparison with Git](git-comparison.md). The Python driver below is limited by its own threads and per-request connections. With 64 requests in flight it reported about 1.3 s per command, while the server's `/metrics` showed 2.3 ms per command including lock waits.
+`o1s-load` (`crates/loadgen`) drives a running server over the authenticated API with persistent connections and checks the final bytes. Its `git` and `compare` modes measure the plain-Git baseline on the same workloads; see the [comparison with Git](git-comparison.md). The Python driver below is limited by its own threads and per-request connections. With 64 requests in flight it reported about 1.3 s per command, while the server's `/metrics` showed 2.3 ms per command including lock waits.
 
 ```sh
-cargo build --release -p o5s-server -p o5s-load
-H5I_APP_SECRET=... target/release/o5s-load o5s --url http://127.0.0.1:3000 --agents 1000 --concurrency 64 --workload disjoint
+cargo build --release -p o1s-server -p o1s-load
+H5I_APP_SECRET=... target/release/o1s-load o1s --url http://127.0.0.1:3000 --agents 1000 --concurrency 64 --workload disjoint
 ```
 
 The results below are for 1,000 authors with 64 requests in flight, on the host described in the Git comparison, on October 11, 2026, with release builds. *Propose* rows count proposals; the review row counts approve-plus-check pairs.
@@ -20,7 +20,7 @@ The results below are for 1,000 authors with 64 requests in flight, on the host 
 | PostgreSQL 17 | One file each | 275 (265 ms) | 180 (370 ms) |
 | PostgreSQL 17 | One repository each | 2,029 (60 ms) | 4,080 (25 ms) |
 
-PostgreSQL ran in a local Docker container reached through Docker's port proxy, with a 32-connection pool. An uncontended approval takes 2.8 ms and a proposal 3.2 ms (`cargo run --release -p o5s-server --example pg_latency`): one simple-query roundtrip for `BEGIN`, the search path and the lock, two typed `SELECT`s, pipelined upserts, and `COMMIT`. A single hot repository is limited by those roundtrips under its lock, to about 350 transactions per second here. Unrelated repositories proceed in parallel. All runs completed with zero failed requests, zero retries and checked contents. The earlier SERIALIZABLE engine reached 95, 106 and 396 proposals/s on these workloads and retried 23% of attempts.
+PostgreSQL ran in a local Docker container reached through Docker's port proxy, with a 32-connection pool. An uncontended approval takes 2.8 ms and a proposal 3.2 ms (`cargo run --release -p o1s-server --example pg_latency`): one simple-query roundtrip for `BEGIN`, the search path and the lock, two typed `SELECT`s, pipelined upserts, and `COMMIT`. A single hot repository is limited by those roundtrips under its lock, to about 350 transactions per second here. Unrelated repositories proceed in parallel. All runs completed with zero failed requests, zero retries and checked contents. The earlier SERIALIZABLE engine reached 95, 106 and 396 proposals/s on these workloads and retried 23% of attempts.
 
 ### Pipelined PostgreSQL commands
 
@@ -50,7 +50,7 @@ In the adjacent-lines run, 3,016 commands committed in 116 transactions, about 2
 
 ### Open-loop runs
 
-`o5s-load o5s --rate R` sends proposals at a fixed rate of R per second, whatever the server's latency, and measures each from its scheduled send time. Queueing behind an overloaded server therefore counts toward latency instead of slowing the client down. Without `--rate`, the clients are closed loop as above.
+`o1s-load o1s --rate R` sends proposals at a fixed rate of R per second, whatever the server's latency, and measures each from its scheduled send time. Queueing behind an overloaded server therefore counts toward latency instead of slowing the client down. Without `--rate`, the clients are closed loop as above.
 
 With group commit, 2,000 agents proposing to one file each in one repository, at fixed offered rates:
 
@@ -66,7 +66,7 @@ Up to 300 per second, a proposal costs about one uncontended transaction. Near 4
 
 ### Where a hot repository's time goes
 
-`/metrics` reports how long committed groups spend in each phase under the lock (`o5s_pg_group_seconds_total`). On October 12, 2026 the open-loop run above (2,000 agents, one file each, one repository) was repeated at 400 and 800 offered proposals/s with commit `5a1a6a5`, once through Docker's port proxy as before and once with the container on the host network (`O5S_PG_NETWORK=host scripts/postgres.sh`):
+`/metrics` reports how long committed groups spend in each phase under the lock (`o1s_pg_group_seconds_total`). On October 12, 2026 the open-loop run above (2,000 agents, one file each, one repository) was repeated at 400 and 800 offered proposals/s with commit `5a1a6a5`, once through Docker's port proxy as before and once with the container on the host network (`O1S_PG_NETWORK=host scripts/postgres.sh`):
 
 | PostgreSQL reached | 400/s offered: achieved (p50) | 800/s offered: achieved (p50, p95) |
 |---|---:|---:|
@@ -84,7 +84,7 @@ Per grouped command, over both runs:
 
 The lock is held for about 2.0 ms per command through the proxy and 1.1 ms on the host network, which bounds one repository near 500 and 900 commands/s. Almost all of it is PostgreSQL executing each command's own reads and writes one command after another; the kernel is negligible. Fewer statements per group (one read per table for the whole group, multi-row writes) would cut it most. That needs set-valued filters and multi-row statements in `h5i_app_sql`, which plans every registry statement. Sending a whole group's reads and writes in one flush each would save only the per-command waits.
 
-With statements kept prepared on each connection (commit `ee4dc71`; `O5S_PREPARED=0` turns it off), the same workload with 3,000 agents on the host network:
+With statements kept prepared on each connection (commit `ee4dc71`; `O1S_PREPARED=0` turns it off), the same workload with 3,000 agents on the host network:
 
 | Statements | 800/s offered: achieved (p50) | 1,200/s offered: achieved (p50) | Write time per command |
 |---|---:|---:|---:|
@@ -102,7 +102,7 @@ With the repository row kept in memory across a group and each command's writes 
 
 ### History length
 
-`o5s-load history` grows one repository through given sizes of admitted graph-document patches, each creating its own file, and at each size times single operations ten times with the whole history in place: a proposal, the admission of one approved patch, the channel view, one document, a Git export, and a workspace round trip (create it, edit a line, propose). `--shape chain` makes each patch depend on the previous one; `independent` patches have no dependencies, so each is a causal head.
+`o1s-load history` grows one repository through given sizes of admitted graph-document patches, each creating its own file, and at each size times single operations ten times with the whole history in place: a proposal, the admission of one approved patch, the channel view, one document, a Git export, and a workspace round trip (create it, edit a line, propose). `--shape chain` makes each patch depend on the previous one; `independent` patches have no dependencies, so each is a causal head.
 
 On October 12, 2026, against a native server on the local PostgreSQL 17 container (through Docker's port proxy), before (commit `0cbb68e`) and after (`5a1a6a5`) the fixes the runs led to, p50 in milliseconds:
 
@@ -124,11 +124,11 @@ Before, every graph proposal and document read resolved the document identity of
 The driver uses Python's standard library. It starts an isolated server with temporary storage and fresh test credentials when `--local-server` is given. It never reads a production signing secret. The server binary must already exist:
 
 ```sh
-CARGO_TARGET_DIR=/var/tmp/o5s-build CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build -p o5s-server
+CARGO_TARGET_DIR=/var/tmp/o1s-build CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0 cargo build -p o1s-server
 python3 scripts/load.py \
-  --local-server /var/tmp/o5s-build/debug/o5s-server \
+  --local-server /var/tmp/o1s-build/debug/o1s-server \
   --agents 1000 --concurrency 64 --batch 100 \
-  --workload disjoint --restart --output /var/tmp/o5s-load.json
+  --workload disjoint --restart --output /var/tmp/o1s-load.json
 ```
 
 `--agents` is the number of distinct author identities and proposals. `--concurrency` limits simultaneous client requests. This command therefore measures 1,000 authors with at most 64 requests in flight. It does not measure 1,000 simultaneously active requests. Requests are closed loop: each worker waits for its response before sending more work. A fixed offered-rate driver, queue-depth measurements and overload tests are still needed for M9 in [the roadmap](roadmap.md).
@@ -162,7 +162,7 @@ To test an existing server, supply a token file with this shape. The values belo
 
 ```sh
 chmod 600 /path/to/load-tokens.json
-python3 scripts/load.py --url https://your-o5s-origin.example \
+python3 scripts/load.py --url https://your-o1s-origin.example \
   --tokens /path/to/load-tokens.json --agents 2 --concurrency 2
 ```
 

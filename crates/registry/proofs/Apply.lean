@@ -6,9 +6,9 @@ The kernel's `apply` and the local engine's in-place `commit` both compute
 `Spec.applyAll`. `schema!` generated the table operations and their lemmas
 (`Schema.lean`); only the dispatch over `Write` is left.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Schema H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Schema H5iAppLib
 
-namespace o5s_registry.ApplyProofs
+namespace o1s_registry.ApplyProofs
 
 theorem write_clone (w : Write) : Write.Insts.CoreCloneClone.clone w = ok w := by
   cases w <;> simp [Write.Insts.CoreCloneClone.clone, Repository.clone_eq, PatchRow.clone_eq, Dependency.clone_eq,
@@ -55,4 +55,4 @@ theorem commit_spec (s : Snapshot) (ws : alloc.vec.Vec Write) (h : Snapshot.size
     · simp only [WP.spec_ok, FoldStep, and_true]
       scalar_tac
 
-end o5s_registry.ApplyProofs
+end o1s_registry.ApplyProofs

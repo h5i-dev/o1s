@@ -1,5 +1,5 @@
 import DocBridge
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Decoding the kernel's view
 
@@ -12,7 +12,7 @@ order. The delete/insert conflicts the kernel finds are exactly the model's
 reach exactly its causal past) and the deletion, insertion and
 acknowledgement tables.
 -/
-namespace o5s_kernel.DocDecode
+namespace o1s_kernel.DocDecode
 open DocModel Document DocRep DocKernel DocKahn DocMatModel DocBridge
 
 variable {d : document.Doc} {H : Hist}
@@ -736,4 +736,4 @@ theorem di_iff (hr : Rep d H) (hb : Built H) (cl : Closed H)
       ext m
       rw [hA m, shared_nodes htm hlm hrm x.anchors.val e3 m]
 
-end o5s_kernel.DocDecode
+end o1s_kernel.DocDecode

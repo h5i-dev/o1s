@@ -2,17 +2,17 @@
 //! snapshot as a commit on `refs/heads/<channel>` of the Artifacts repository
 //! `<tenant>-<repo>`. Agents get read tokens for it, and each agent gets its
 //! own workspace repository `<tenant>-<repo>.<user>` (names cannot contain
-//! `.`, so the two never collide) holding the snapshot on `o5s/<channel>`.
+//! `.`, so the two never collide) holding the snapshot on `o1s/<channel>`.
 //!
 //! The Artifacts binding cannot write, so the Worker speaks Git's push
-//! protocol itself (`o5s_gitpush`) with a short-lived write token. Each commit
+//! protocol itself (`o1s_gitpush`) with a short-lived write token. Each commit
 //! records the registry generation it shows; an export never replaces a
 //! commit of a newer generation, and the push names the remote's current
 //! commit as the old value, so concurrent exports cannot lose one another.
 use crate::workspace::{Entry, Kind, Objects};
 use js_sys::{Function, Promise, Reflect, Uint8Array};
-use o5s_gitpush as git;
-use o5s_platform::{Repository, View, workspace};
+use o1s_gitpush as git;
+use o1s_platform::{Repository, View, workspace};
 use std::collections::BTreeMap;
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
@@ -27,7 +27,7 @@ fn hashes<'a>(repo: &'a Repository, view: &View) -> Result<Vec<&'a str>, String>
     workspace::snapshot(repo, &view.patches).map_err(|e| e.0)
 }
 
-/// The generation an o5s commit message records, if any.
+/// The generation an o1s commit message records, if any.
 pub fn generation_of(message: &str) -> Option<u64> {
     workspace::parse(message)?.0
 }
@@ -44,10 +44,10 @@ pub fn files(view: &View) -> Result<BTreeMap<String, git::File>, String> {
                 .entry(p)
                 .ok_or_else(|| format!("{p}: invalid binary content or submodule id"))?;
             let mode = match mode {
-                o5s_platform::Mode::Regular => git::Mode::Regular,
-                o5s_platform::Mode::Executable => git::Mode::Executable,
-                o5s_platform::Mode::Symlink => git::Mode::Symlink,
-                o5s_platform::Mode::Gitlink => git::Mode::Gitlink,
+                o1s_platform::Mode::Regular => git::Mode::Regular,
+                o1s_platform::Mode::Executable => git::Mode::Executable,
+                o1s_platform::Mode::Symlink => git::Mode::Symlink,
+                o1s_platform::Mode::Gitlink => git::Mode::Gitlink,
             };
             Ok((p.clone(), (bytes, mode)))
         })
@@ -217,7 +217,7 @@ pub async fn access(env: &worker::Env, name: &str) -> Result<serde_json::Value, 
     Ok(serde_json::json!({"remote":remote,"token":token,"expires_at":expires}))
 }
 
-/// Put the snapshot on `o5s/<channel>` of the agent's workspace repository
+/// Put the snapshot on `o1s/<channel>` of the agent's workspace repository
 /// `name` and hand out a write token for it. The agent clones it, commits on
 /// another branch and pushes; `propose` reads the changes from there.
 pub async fn workspace(
@@ -228,7 +228,7 @@ pub async fn workspace(
     view: &View,
 ) -> Result<serde_json::Value, String> {
     let (artifact, remote) = open(&binding(env)?, name).await?;
-    let branch = format!("o5s/{channel}");
+    let branch = format!("o1s/{channel}");
     let mut pushed = push(
         &artifact,
         &remote,
@@ -273,11 +273,11 @@ impl Objects for Remote<'_> {
 }
 
 /// A branch name an agent may push: Git ref characters, no `..`, and not
-/// under `o5s/`, which holds the snapshots.
+/// under `o1s/`, which holds the snapshots.
 pub fn valid_branch(b: &str) -> bool {
     !b.is_empty()
         && b.len() <= 200
-        && !b.starts_with("o5s/")
+        && !b.starts_with("o1s/")
         && !b.contains("..")
         && !b.starts_with('/')
         && !b.ends_with('/')
@@ -292,8 +292,8 @@ pub async fn changes(
     env: &worker::Env,
     name: &str,
     branch: &str,
-) -> Result<(String, String, Vec<o5s_platform::Edit>), o5s_platform::Refusal> {
-    use o5s_platform::Refusal;
+) -> Result<(String, String, Vec<o1s_platform::Edit>), o1s_platform::Refusal> {
+    use o1s_platform::Refusal;
     let fail = |e: String| Refusal(format!("workspace read failed: {e}"));
     let artifact = Repo(
         call(&binding(env).map_err(fail)?, "get", &[name.into()])
@@ -317,7 +317,7 @@ pub async fn changes(
     let base = log
         .iter()
         .find(|c| field(c, "message").is_some_and(|m| workspace::parse(&m).is_some()))
-        .ok_or_else(|| Refusal("no o5s snapshot in the branch's first-parent history".into()))?;
+        .ok_or_else(|| Refusal("no o1s snapshot in the branch's first-parent history".into()))?;
     let tree = |c: &JsValue| field(c, "treeHash").ok_or_else(|| fail(describe(c)));
     let edits = crate::workspace::changes(&Remote(&artifact), &tree(&base)?, &tree(&head)?).await?;
     Ok((
@@ -378,7 +378,7 @@ async fn push(
         let commit = git::commit(
             &tree,
             head.as_ref(),
-            "o5s <o5s@localhost>",
+            "o1s <o1s@localhost>",
             seconds,
             &message,
         );
@@ -418,11 +418,11 @@ mod tests {
         let view = View::default();
         assert_eq!(generation_of(&message(42, &repo, &view).unwrap()), Some(42));
         assert_eq!(
-            generation_of("o5s verified-admission projection\n\nPatch hashes:\n"),
+            generation_of("o1s verified-admission projection\n\nPatch hashes:\n"),
             None
         );
         assert!(valid_branch("work") && valid_branch("agent/fix-1"));
-        for b in ["", "o5s/main", "a..b", "/x", "x/", "x.lock", "a b", "a:b"] {
+        for b in ["", "o1s/main", "a..b", "/x", "x/", "x.lock", "a b", "a:b"] {
             assert!(!valid_branch(b), "{b}");
         }
         assert_eq!(generation_of("unrelated"), None);

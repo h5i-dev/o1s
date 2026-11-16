@@ -1,5 +1,5 @@
 //! Measure actual document admission and materialization, including ancestry cost.
-use o5s_kernel::model::{Anchor, DocumentGraph, NodeId, Operation, OperationId, Patch, PatchId};
+use o1s_kernel::model::{Anchor, DocumentGraph, NodeId, Operation, OperationId, Patch, PatchId};
 use std::time::Instant;
 
 fn identity(sequence: usize) -> PatchId {

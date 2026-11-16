@@ -1,6 +1,6 @@
 import DocDecode
 import DocRefine
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The extracted `materialize` refines the model's view
 
@@ -12,7 +12,7 @@ axioms) and the decoding (`isView_of`, `di_iff`, `atom_bytes`).
 `extracted_view_converges` (T3.5) follows with the model's uniqueness and
 permutation invariance of the view.
 -/
-namespace o5s_kernel.DocMatRefine
+namespace o1s_kernel.DocMatRefine
 open DocModel Document DocRep DocKernel DocKahn DocMatModel DocBridge DocDecode DocRefine
 
 variable {d : document.Doc} {H : Hist}
@@ -148,4 +148,4 @@ theorem extracted_view_converges (d₁ d₂ : document.Doc) (H₁ H₂ : Hist)
   intro v₂ hv₂
   exact view_unique H₁ _ _ hv₁ ((view_perm u₁ hp _).mpr hv₂)
 
-end o5s_kernel.DocMatRefine
+end o1s_kernel.DocMatRefine

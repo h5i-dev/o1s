@@ -1,5 +1,5 @@
-\begin{filecontents*}[overwrite]{o5s-references.bib}
-@misc{o5s, author={{o5s contributors}}, title={{o5s}: Source, proofs, and recorded measurements at commit d615e77}, year={2026}, url={https://github.com/h5i-dev/o5s/tree/d615e77c60995137ddb47b0bd56544143d76a01c}, note={Pinned artifact; full revision d615e77c60995137ddb47b0bd56544143d76a01c}}
+\begin{filecontents*}[overwrite]{o1s-references.bib}
+@misc{o1s, author={{o1s contributors}}, title={{o1s}: Source, proofs, and recorded measurements at commit d615e77}, year={2026}, url={https://github.com/h5i-dev/o1s/tree/d615e77c60995137ddb47b0bd56544143d76a01c}, note={Pinned artifact; full revision d615e77c60995137ddb47b0bd56544143d76a01c}}
 @misc{cfgit, author={Dina Kozlov and Dillon Mulroy and Zebulon Piasecki}, title={We want you to build the next Git platform on Cloudflare}, year={2026}, month=oct, howpublished={The Cloudflare Blog}, url={https://blog.cloudflare.com/next-git-platform-on-cloudflare/}, note={October 1, 2026}}
 @misc{h5i, author={{h5i contributors}}, title={h5i: The agent-native web security workspace}, year={2026}, url={https://github.com/h5i-dev/h5i}, note={Includes the h5i-app framework (crates h5i-app 0.1.1 and companions); accessed October 12, 2026}}
 @misc{charon, author={{AeneasVerif}}, title={Charon: Interface with the rustc internals}, year={2026}, url={https://github.com/AeneasVerif/charon}, note={Accessed October 12, 2026}}
@@ -28,7 +28,7 @@
 \usetikzlibrary{arrows.meta,positioning}
 \settopmatter{printacmref=false,printfolios=true}
 \setcopyright{none}
-\newcommand{\sys}{\textnormal{o5s}}
+\newcommand{\sys}{\textnormal{o1s}}
 \newcommand{\code}[1]{\texttt{\small #1}}
 \setlength{\emergencystretch}{1.5em}
 \setlength{\parskip}{0pt plus 3pt}
@@ -45,7 +45,7 @@
 \newcommand{\Err}{\mathsf{Err}}
 \newtheorem{definition}{Definition}
 \newtheorem{claim}{Theorem}
-\title[o5s: Verified Version Control for Agent Swarms]{o5s: Verified Patch Admission and Conflict-Preserving\texorpdfstring{\\}{ }Version Control for Agent Swarms}
+\title[o1s: Verified Version Control for Agent Swarms]{o1s: Verified Patch Admission and Conflict-Preserving\texorpdfstring{\\}{ }Version Control for Agent Swarms}
 \author{The h5i Team}
 \affiliation{\institution{\href{https://h5i.dev}{h5i.dev}}\city{}\country{}}
 \renewcommand{\shortauthors}{The h5i Team}
@@ -88,7 +88,7 @@ In summary, we make the following contributions:
 \item A server that runs the verified kernel over a local log, PostgreSQL, and Cloudflare Workers with Artifacts, and interoperates with ordinary Git workspaces (Section~\ref{sec:architecture}).
 \item Measurements against unattended Git for 1,000 agents on one host, and an explicit account of what remains trusted and unmeasured (Sections~\ref{sec:threat} and~\ref{sec:evidence}).
 \end{itemize}
-\sys\ is open source, and the implementation, the Lean proofs, and the measurement reports are available online~\cite{o5s}.
+\sys\ is open source, and the implementation, the Lean proofs, and the measurement reports are available online~\cite{o1s}.
 
 \section{Background}\label{sec:background}
 \subsection{Patch-based version control}
@@ -262,7 +262,7 @@ The legacy representation edits a file as lines against one immutable base. An e
 
 \section{Verification with h5i-app}\label{sec:verification}
 \subsection{Instantiating the kernel contract}\label{sec:toolchain}
-\sys\ has two extracted kernels. The \emph{registry} kernel is the h5i-app transition of Equation~\ref{eq:kernel}. The \emph{document} kernel, \code{o5s\_kernel}, holds validation, commit, and materialization for graph documents, line merging for interval documents, and the head computation, and is called by the registry kernel and by the shell. Both are written in the Rust subset Charon and Aeneas translate, and both are extracted by h5i-app.
+\sys\ has two extracted kernels. The \emph{registry} kernel is the h5i-app transition of Equation~\ref{eq:kernel}. The \emph{document} kernel, \code{o1s\_kernel}, holds validation, commit, and materialization for graph documents, line merging for interval documents, and the head computation, and is called by the registry kernel and by the shell. Both are written in the Rust subset Charon and Aeneas translate, and both are extracted by h5i-app.
 
 The registry kernel instantiates Equation~\ref{eq:kernel} as follows.
 \begin{itemize}
@@ -310,7 +310,7 @@ For a dependency-closed channel $C$ whose dependency rows form a DAG, the extrac
 \noindent\emph{Proof sketch.} Every member either is a head or is a dependency of some member. Following dependency edges upward from any member reaches a head because the graph is finite and acyclic, so every member is in the past of some head. Heads are members, so the converse inclusion holds (\code{Heads.heads\_keep\_past}). The native workspace adapter is responsible for binding the heads it names to the snapshot it actually exported.
 
 \subsection{Trusted computing base}\label{sec:gate}
-The proofs are complete and axiom-free: no theorem depends on \code{sorry}, \code{native\_decide}, or any axiom beyond Lean's \code{propext}, \code{Classical.choice}, and \code{Quot.sound}. The Lean they are about is regenerated from the current Rust source and compared byte for byte with the translation the proofs were checked against, so a change to a kernel that is not reflected in the proofs is detected. The full statements, with all hypotheses, are in the repository~\cite{o5s}.
+The proofs are complete and axiom-free: no theorem depends on \code{sorry}, \code{native\_decide}, or any axiom beyond Lean's \code{propext}, \code{Classical.choice}, and \code{Quot.sound}. The Lean they are about is regenerated from the current Rust source and compared byte for byte with the translation the proofs were checked against, so a change to a kernel that is not reflected in the proofs is detected. The full statements, with all hypotheses, are in the repository~\cite{o1s}.
 
 \section{System architecture}\label{sec:architecture}
 \begin{figure}[t]
@@ -361,7 +361,7 @@ The Cloudflare deployment reaches PostgreSQL through Hyperdrive and keeps projec
 Table~\ref{tab:measurements} compares \sys\ with unattended Git. The host was a 128-thread AMD EPYC 7502 with 251\,GiB of memory, running clients and server together. The \sys\ server used the local-log engine in a release build. Git 2.43.0 used pre-created clones and a \code{file://} remote, so the Git side paid for no server, authentication, or network. Each run had 1,000 agents with at most 64 requests in flight. A Git agent pushed, and on rejection pulled with rebase and pushed again, and a rebase conflict stopped it. An \sys\ agent proposed, an independent identity approved and reported a passing check, and patches were merged in batches of 100. The shared-file workloads used interval proposals (Section~\ref{sec:interval}), not graph documents, and the check reports were generated by the load driver, not by running a test suite. Final contents were checked in every run.
 
 \begin{table}[t]
-\caption{Recorded integrations per second, 1,000 agents on one host. Every \sys\ run admitted all 1,000 proposals. \emph{API} agents call the HTTP API directly, and \emph{CLI} agents run \code{o5s propose} in their own Git repository.}
+\caption{Recorded integrations per second, 1,000 agents on one host. Every \sys\ run admitted all 1,000 proposals. \emph{API} agents call the HTTP API directly, and \emph{CLI} agents run \code{o1s propose} in their own Git repository.}
 \label{tab:measurements}
 \centering\small
 \begin{tabular}{@{}lrrrr@{}}
@@ -385,5 +385,5 @@ The Git baseline is one unattended workflow without a merge queue, custom merge 
 We presented \sys, a patch-based collaboration server for agent swarms whose Rust decision kernel is formally verified in Lean~4 against a model of review-gated, conflict-preserving version control. The proofs establish that the kernel refines the model and preserves dependency closure and independent review in every reachable state, that a patch is admitted only with an approval and a passing check from identities other than its author, that materialization of a graph document is independent of delivery order, and that the causal heads a workspace names cover the snapshot it saw. The same kernel serves a local log, PostgreSQL, and Cloudflare Workers with Artifacts, and agents interact with it through ordinary Git checkouts. With 1,000 agents on one repository, \sys\ admits every proposal at 244 to 1,083 integrations per second across the measured workloads, whereas on adjacent lines of one file unattended Git integrates 9.8 changes per second and stops 569 of the agents at rebase conflicts.
 
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{o5s-references}
+\bibliography{o1s-references}
 \end{document}

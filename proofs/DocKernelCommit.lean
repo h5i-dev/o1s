@@ -1,5 +1,5 @@
 import DocKernel
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Specifications of the document kernel's commit
 
@@ -7,7 +7,7 @@ open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
 (`commit_op_spec`), and `commit` as a whole (`commit_spec`): the committed
 document's list form is `commitL` of the old one.
 -/
-namespace o5s_kernel.DocKernel
+namespace o1s_kernel.DocKernel
 
 /-! ## The validation loop -/
 
@@ -429,4 +429,4 @@ theorem commit_spec (doc : document.Doc) (p : document.Patch)
     simp [absD, v1_post, hdeps]
   · simp [absD]
 
-end o5s_kernel.DocKernel
+end o1s_kernel.DocKernel

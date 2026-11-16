@@ -1,9 +1,9 @@
 //! One interface over the local log store and PostgreSQL.
 use crate::{local::Store, pg::PgBackend};
-use o5s_platform::{Actor, Command, Repository};
+use o1s_platform::{Actor, Command, Repository};
 use std::sync::{Arc, Mutex};
 
-pub use o5s_pgwire::service::Failure;
+pub use o1s_pgwire::service::Failure;
 
 #[derive(Clone)]
 pub enum Backend {
@@ -63,7 +63,7 @@ impl Backend {
             Backend::Local(store) => {
                 let store = store.lock().unwrap();
                 format!(
-                    "# TYPE o5s_local_log_bytes gauge\no5s_local_log_bytes {}\n# TYPE o5s_local_poisoned gauge\no5s_local_poisoned {}\n",
+                    "# TYPE o1s_local_log_bytes gauge\no1s_local_log_bytes {}\n# TYPE o1s_local_poisoned gauge\no1s_local_poisoned {}\n",
                     store.log_length(),
                     u8::from(store.poisoned())
                 )
@@ -72,20 +72,20 @@ impl Backend {
                 use std::sync::atomic::Ordering::Relaxed;
                 let s = &pg.engine.stats;
                 let mut groups = format!(
-                    "# TYPE o5s_pg_groups_total counter\no5s_pg_groups_total {}\n# TYPE o5s_pg_grouped_commands_total counter\no5s_pg_grouped_commands_total {}\n# TYPE o5s_pg_group_write_statements_total counter\no5s_pg_group_write_statements_total {}\n# TYPE o5s_pg_group_seconds_total counter\n",
+                    "# TYPE o1s_pg_groups_total counter\no1s_pg_groups_total {}\n# TYPE o1s_pg_grouped_commands_total counter\no1s_pg_grouped_commands_total {}\n# TYPE o1s_pg_group_write_statements_total counter\no1s_pg_group_write_statements_total {}\n# TYPE o1s_pg_group_seconds_total counter\n",
                     s.groups.load(Relaxed),
                     s.grouped.load(Relaxed),
                     s.group_writes.load(Relaxed)
                 );
-                for (phase, us) in o5s_pgwire::GROUP_PHASES.iter().zip(&s.group_us) {
+                for (phase, us) in o1s_pgwire::GROUP_PHASES.iter().zip(&s.group_us) {
                     groups.push_str(&format!(
-                        "o5s_pg_group_seconds_total{{phase=\"{phase}\"}} {}\n",
+                        "o1s_pg_group_seconds_total{{phase=\"{phase}\"}} {}\n",
                         us.load(Relaxed) as f64 / 1e6
                     ));
                 }
                 groups
                     + &format!(
-                        "# TYPE o5s_pg_attempts_total counter\no5s_pg_attempts_total {}\n# TYPE o5s_pg_retries_total counter\no5s_pg_retries_total {}\n# TYPE o5s_pg_commits_total counter\no5s_pg_commits_total {}\n# TYPE o5s_pg_replays_total counter\no5s_pg_replays_total {}\n",
+                        "# TYPE o1s_pg_attempts_total counter\no1s_pg_attempts_total {}\n# TYPE o1s_pg_retries_total counter\no1s_pg_retries_total {}\n# TYPE o1s_pg_commits_total counter\no1s_pg_commits_total {}\n# TYPE o1s_pg_replays_total counter\no1s_pg_replays_total {}\n",
                         s.attempts.load(Relaxed),
                         s.retries.load(Relaxed),
                         s.commits.load(Relaxed),

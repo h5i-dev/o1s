@@ -1,5 +1,5 @@
-use o5s_kernel::model::{Anchor, NodeId, Operation, OperationId};
-use o5s_platform::{
+use o1s_kernel::model::{Anchor, NodeId, Operation, OperationId};
+use o1s_platform::{
     Actor, Command, Database,
     documents::{GraphEdit, identity},
 };
@@ -207,7 +207,7 @@ fn unobserved_anchors_and_legacy_mix_are_refused_without_mutation() {
                 repo: "r".into(),
                 intent: "bad".into(),
                 dependencies: vec![1],
-                edits: vec![o5s_platform::Edit {
+                edits: vec![o1s_platform::Edit {
                     path: "file".into(),
                     content: Some("replacement".into()),
                     ..Default::default()

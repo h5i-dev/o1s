@@ -1,5 +1,5 @@
 //! Per-command cost of the kernel-backed local engine as a repository grows.
-use o5s_platform::{Actor, Command, Database};
+use o1s_platform::{Actor, Command, Database};
 use serde_json::json;
 use std::time::Instant;
 

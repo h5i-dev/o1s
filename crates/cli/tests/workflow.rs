@@ -1,4 +1,4 @@
-use o5s_server::{AppState, Backend, Store, auth::HmacAuth, router};
+use o1s_server::{AppState, Backend, Store, auth::HmacAuth, router};
 use serde_json::Value;
 use std::{
     fs,
@@ -54,12 +54,12 @@ impl Fixture {
         path
     }
     fn command(&self, cwd: &Path, user: u64, tenant: u64, args: &[&str]) -> Output {
-        Command::new(env!("CARGO_BIN_EXE_o5s"))
+        Command::new(env!("CARGO_BIN_EXE_o1s"))
             .current_dir(cwd)
-            .env("O5S_URL", &self.url)
-            .env("O5S_TOKEN", self.auth.issue(tenant, user, u64::MAX))
-            .env("O5S_CONFIG", self.root.path().join("config.json"))
-            .env_remove("O5S_PROFILE")
+            .env("O1S_URL", &self.url)
+            .env("O1S_TOKEN", self.auth.issue(tenant, user, u64::MAX))
+            .env("O1S_CONFIG", self.root.path().join("config.json"))
+            .env_remove("O1S_PROFILE")
             .args(args)
             .output()
             .unwrap()
@@ -183,7 +183,7 @@ async fn native_git_worktrees_independent_review_and_parallel_line_merge() {
             "add",
             "--detach",
             b.to_str().unwrap(),
-            "refs/o5s/main",
+            "refs/o1s/main",
         ],
     );
     fs::write(a.join("file.txt"), "ONE\ntwo\nthree\nfour\n").unwrap();
@@ -212,7 +212,7 @@ async fn native_git_worktrees_independent_review_and_parallel_line_merge() {
         "ONE\ntwo\nthree\nfour\n"
     );
     assert_eq!(
-        git(&a, &["show", "refs/o5s/main:file.txt"]),
+        git(&a, &["show", "refs/o1s/main:file.txt"]),
         "ONE\ntwo\nthree\nFOUR"
     );
     let tenant = f.command(&a, 2, 2, &["status"]);
@@ -240,9 +240,9 @@ async fn conflicting_edits_never_overwrite_git_ref_or_checkout() {
     f.admit(&a, left);
     f.admit(&a, right);
     assert!(!f.ok(&a, 1, &["view"])["conflicts"]["f"].is_null());
-    let reference = git(&a, &["rev-parse", "refs/o5s/main"]);
+    let reference = git(&a, &["rev-parse", "refs/o1s/main"]);
     f.fail(&a, 1, &["fetch"], "conflicts");
-    assert_eq!(git(&a, &["rev-parse", "refs/o5s/main"]), reference);
+    assert_eq!(git(&a, &["rev-parse", "refs/o1s/main"]), reference);
     assert_eq!(fs::read_to_string(a.join("f")).unwrap(), "right\n");
     let resolution = f.root.path().join("resolution.txt");
     fs::write(&resolution, "reviewed resolution\n").unwrap();
@@ -260,7 +260,7 @@ async fn conflicting_edits_never_overwrite_git_ref_or_checkout() {
     ));
     f.admit(&a, resolved);
     f.ok(&a, 1, &["fetch"]);
-    assert_eq!(git(&a, &["show", "refs/o5s/main:f"]), "reviewed resolution");
+    assert_eq!(git(&a, &["show", "refs/o1s/main:f"]), "reviewed resolution");
     assert_eq!(fs::read_to_string(a.join("f")).unwrap(), "right\n");
 }
 
@@ -289,11 +289,11 @@ async fn saved_credentials_stay_at_the_authenticated_origin() {
             0o600
         );
     }
-    let o = Command::new(env!("CARGO_BIN_EXE_o5s"))
+    let o = Command::new(env!("CARGO_BIN_EXE_o1s"))
         .current_dir(&a)
-        .env_remove("O5S_TOKEN")
-        .env("O5S_URL", "http://127.0.0.1:1")
-        .env("O5S_CONFIG", f.root.path().join("config.json"))
+        .env_remove("O1S_TOKEN")
+        .env("O1S_URL", "http://127.0.0.1:1")
+        .env("O1S_CONFIG", f.root.path().join("config.json"))
         .args(["connect", "wrong"])
         .output()
         .unwrap();
@@ -405,7 +405,7 @@ async fn binary_executable_and_removed_files_round_trip_and_paths_below_symlinks
     let first = patch(f.ok(&a, 1, &["propose", "--intent", "content"]));
     f.admit(&a, first);
     f.ok(&a, 1, &["fetch"]);
-    let tree = git(&a, &["ls-tree", "-r", "refs/o5s/main"]);
+    let tree = git(&a, &["ls-tree", "-r", "refs/o1s/main"]);
     assert!(
         tree.contains("100755 blob") && tree.contains("run.sh"),
         "{tree}"
@@ -415,7 +415,7 @@ async fn binary_executable_and_removed_files_round_trip_and_paths_below_symlinks
         "{tree}"
     );
     let blob = std::process::Command::new("git")
-        .args(["-C", a.to_str().unwrap(), "show", "refs/o5s/main:blob.bin"])
+        .args(["-C", a.to_str().unwrap(), "show", "refs/o1s/main:blob.bin"])
         .output()
         .unwrap()
         .stdout;
@@ -424,12 +424,12 @@ async fn binary_executable_and_removed_files_round_trip_and_paths_below_symlinks
     for name in ["blob.bin", "run.sh", "empty.txt"] {
         fs::remove_file(a.join(name)).unwrap();
     }
-    git(&a, &["checkout", "-q", "--detach", "refs/o5s/main"]);
+    git(&a, &["checkout", "-q", "--detach", "refs/o1s/main"]);
     fs::remove_file(a.join("empty.txt")).unwrap();
     let removal = patch(f.ok(&a, 1, &["propose", "--intent", "remove"]));
     f.admit(&a, removal);
     f.ok(&a, 1, &["fetch"]);
-    assert!(!git(&a, &["ls-tree", "-r", "refs/o5s/main"]).contains("empty.txt"));
+    assert!(!git(&a, &["ls-tree", "-r", "refs/o1s/main"]).contains("empty.txt"));
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -532,11 +532,11 @@ async fn graph_operations_use_portable_nodes_and_reviewed_order_resolution() {
     assert_eq!(document["bytes"], json!(b"left\nright\nbase\n".to_vec()));
     f.ok(&a, 1, &["fetch"]);
     assert_eq!(
-        git(&a, &["show", "refs/o5s/main:graph.txt"]),
+        git(&a, &["show", "refs/o1s/main:graph.txt"]),
         "left\nright\nbase"
     );
     assert!(!a.join("graph.txt").exists());
-    git(&a, &["reset", "--hard", "refs/o5s/main"]);
+    git(&a, &["reset", "--hard", "refs/o1s/main"]);
     fs::write(a.join("graph.txt"), "updated left\nright\nbase\n").unwrap();
     git(&a, &["add", "graph.txt"]);
     fs::write(a.join("graph.txt"), "updated left\nupdated right\nbase\n").unwrap();
@@ -549,7 +549,7 @@ async fn graph_operations_use_portable_nodes_and_reviewed_order_resolution() {
     f.admit(&a, native);
     f.ok(&a, 1, &["fetch"]);
     assert_eq!(
-        git(&a, &["show", "refs/o5s/main:graph.txt"]),
+        git(&a, &["show", "refs/o1s/main:graph.txt"]),
         "updated left\nupdated right\nbase"
     );
     assert_eq!(git(&a, &["ls-files", "--stage"]), index);
@@ -648,7 +648,7 @@ async fn native_graph_worktrees_keep_causal_anchors_after_other_agents_merge() {
     );
     f.admit(&a, base);
     f.ok(&a, 1, &["fetch"]);
-    git(&a, &["reset", "--hard", "refs/o5s/main"]);
+    git(&a, &["reset", "--hard", "refs/o1s/main"]);
     let b = f.root.path().join("native-graph-agent");
     git(
         &a,
@@ -657,7 +657,7 @@ async fn native_graph_worktrees_keep_causal_anchors_after_other_agents_merge() {
             "add",
             "--detach",
             b.to_str().unwrap(),
-            "refs/o5s/main",
+            "refs/o1s/main",
         ],
     );
     let original = f.ok(&a, 1, &["document", "file.txt"]);
@@ -678,14 +678,14 @@ async fn native_graph_worktrees_keep_causal_anchors_after_other_agents_merge() {
     f.admit(&b, second);
     f.ok(&b, 2, &["fetch"]);
     assert_eq!(
-        git(&b, &["show", "refs/o5s/main:file.txt"]),
+        git(&b, &["show", "refs/o1s/main:file.txt"]),
         "ONE\ntwo\nthree\nFOUR"
     );
     assert_eq!(
         fs::read_to_string(b.join("file.txt")).unwrap(),
         "one\ntwo\nthree\nFOUR\n"
     );
-    git(&b, &["reset", "--hard", "refs/o5s/main"]);
+    git(&b, &["reset", "--hard", "refs/o1s/main"]);
     // Partial edits inside a UTF-8 atom replace that atom without splitting a
     // code point, and preserve the unaffected middle anchors.
     fs::write(b.join("file.txt"), "O日NE\ntwo\nthree\nFOUR\n").unwrap();
@@ -696,33 +696,33 @@ async fn native_graph_worktrees_keep_causal_anchors_after_other_agents_merge() {
     f.admit(&b, unicode);
     f.ok(&b, 2, &["fetch"]);
     assert_eq!(
-        git(&b, &["show", "refs/o5s/main:file.txt"]),
+        git(&b, &["show", "refs/o1s/main:file.txt"]),
         "O日NE\ntwo\nthree\nFOUR"
     );
     assert_eq!(
-        git(&b, &["show", "refs/o5s/main:added.txt"]),
+        git(&b, &["show", "refs/o1s/main:added.txt"]),
         "new graph document"
     );
-    git(&b, &["reset", "--hard", "refs/o5s/main"]);
+    git(&b, &["reset", "--hard", "refs/o1s/main"]);
     fs::write(b.join("file.txt"), "").unwrap();
     let empty = patch(f.ok(&b, 2, &["propose", "--intent", "delete all atoms"]));
     f.admit(&b, empty);
     f.ok(&b, 2, &["fetch"]);
-    assert_eq!(git(&b, &["show", "refs/o5s/main:file.txt"]), "");
+    assert_eq!(git(&b, &["show", "refs/o1s/main:file.txt"]), "");
     // An empty new document beside an edit, then removal of a document.
     fs::write(b.join("file.txt"), "changed\n").unwrap();
     fs::write(b.join("new.txt"), "").unwrap();
     let created = patch(f.ok(&b, 2, &["propose", "--intent", "empty new file"]));
     f.admit(&b, created);
     f.ok(&b, 2, &["fetch"]);
-    assert_eq!(git(&b, &["show", "refs/o5s/main:new.txt"]), "");
-    assert_eq!(git(&b, &["show", "refs/o5s/main:file.txt"]), "changed");
-    git(&b, &["reset", "--hard", "refs/o5s/main"]);
+    assert_eq!(git(&b, &["show", "refs/o1s/main:new.txt"]), "");
+    assert_eq!(git(&b, &["show", "refs/o1s/main:file.txt"]), "changed");
+    git(&b, &["reset", "--hard", "refs/o1s/main"]);
     fs::remove_file(b.join("file.txt")).unwrap();
     let removed = patch(f.ok(&b, 2, &["propose", "--intent", "remove graph path"]));
     f.admit(&b, removed);
     f.ok(&b, 2, &["fetch"]);
-    assert!(!git(&b, &["ls-tree", "-r", "--name-only", "refs/o5s/main"]).contains("file.txt"));
+    assert!(!git(&b, &["ls-tree", "-r", "--name-only", "refs/o1s/main"]).contains("file.txt"));
 }
 
 #[cfg(unix)]
@@ -736,7 +736,7 @@ async fn ci_runs_checks_on_each_proposal_snapshot_and_reports_them() {
     fs::write(a.join("value"), "broken\n").unwrap();
     let bad = f.legacy(&a, "ci", &["value"], "bad");
     // The check sees exactly the proposal's snapshot.
-    let command = "test \"$(cat value)\" = ok && test \"$O5S_SNAPSHOT\" = \"$PWD\"";
+    let command = "test \"$(cat value)\" = ok && test \"$O1S_SNAPSHOT\" = \"$PWD\"";
     let run = f.ok(&a, 91, &["ci", "--command", command]);
     let results: Vec<(u64, bool)> = run["checked"]
         .as_array()
@@ -788,7 +788,7 @@ async fn symlinks_and_submodules_round_trip_through_proposals_and_fetch() {
     assert_eq!(view["files"]["vendor/lib"], commit);
     assert_eq!(view["submodules"], serde_json::json!(["vendor/lib"]));
     f.ok(&a, 1, &["fetch"]);
-    let tree = git(&a, &["ls-tree", "-r", "refs/o5s/main"]);
+    let tree = git(&a, &["ls-tree", "-r", "refs/o1s/main"]);
     assert!(
         tree.contains("120000 blob") && tree.contains("\tlink"),
         "{tree}"
@@ -802,7 +802,7 @@ async fn symlinks_and_submodules_round_trip_through_proposals_and_fetch() {
     fs::remove_file(a.join("link")).unwrap();
     fs::remove_file(a.join("target.txt")).unwrap();
     git(&a, &["rm", "-q", "--cached", "vendor/lib"]);
-    git(&a, &["checkout", "-q", "--detach", "refs/o5s/main"]);
+    git(&a, &["checkout", "-q", "--detach", "refs/o1s/main"]);
     assert_eq!(
         fs::read_link(a.join("link")).unwrap().to_str(),
         Some("target.txt")
@@ -825,7 +825,7 @@ async fn git_mv_moves_a_graph_document_and_concurrent_old_path_edits_follow() {
     let base = patch(f.ok(&a, 1, &["propose", "--intent", "base"]));
     f.admit(&a, base);
     f.ok(&a, 1, &["fetch"]);
-    git(&a, &["reset", "--hard", "refs/o5s/main"]);
+    git(&a, &["reset", "--hard", "refs/o1s/main"]);
     let b = f.root.path().join("moves-agent");
     git(
         &a,
@@ -834,7 +834,7 @@ async fn git_mv_moves_a_graph_document_and_concurrent_old_path_edits_follow() {
             "add",
             "--detach",
             b.to_str().unwrap(),
-            "refs/o5s/main",
+            "refs/o1s/main",
         ],
     );
     // Agent A renames the file (and edits it); agent B edits the old path.

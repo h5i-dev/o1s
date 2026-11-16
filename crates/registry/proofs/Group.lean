@@ -14,9 +14,9 @@ returns from the state the earlier commands left, so `pg_served` applies to
 each command (`group_served`). `defer_repo` shows that writing every other
 row in order and the repository row last stores that same state.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Writes H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Writes H5iAppLib
 
-namespace o5s_registry.Group
+namespace o1s_registry.Group
 open Served
 
 /-- `load` reads the repository row whole, into its own field: loading from
@@ -97,4 +97,4 @@ theorem defer_repo (s : St) (ws : List Write) :
   congr 1
   cases h : (ws.filterMap repoOf).getLast? <;> simp
 
-end o5s_registry.Group
+end o1s_registry.Group

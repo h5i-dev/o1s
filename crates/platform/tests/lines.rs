@@ -1,4 +1,4 @@
-use o5s_platform::{lines::LineEdit, *};
+use o1s_platform::{lines::LineEdit, *};
 fn actor(user: u64) -> Actor {
     Actor { tenant: 1, user }
 }
@@ -231,7 +231,7 @@ fn unicode_crlf_empty_file_and_insert_at_end_preserve_exact_bytes() {
 
 #[test]
 fn indexed_range_merge_matches_pairwise_spec_in_every_small_permutation() {
-    use o5s_platform::lines::LineVersion;
+    use o1s_platform::lines::LineVersion;
     let ranges: Vec<_> = (0..=4).flat_map(|a| (a..=4).map(move |z| (a, z))).collect();
     for &(a, z) in &ranges {
         for &(b, w) in &ranges {
@@ -291,7 +291,7 @@ fn indexed_range_merge_matches_pairwise_spec_in_every_small_permutation() {
 
 #[test]
 fn ten_thousand_disjoint_line_agents_render_one_file_without_conflicts() {
-    use o5s_platform::lines::LineVersion;
+    use o1s_platform::lines::LineVersion;
     let original: std::sync::Arc<str> = "old\n".repeat(10_000).into();
     let versions: Vec<_> = (0..10_000)
         .map(|n| LineVersion {

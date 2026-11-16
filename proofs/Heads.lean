@@ -1,5 +1,5 @@
 import Causality
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # Causal heads of a patch set
 
@@ -8,7 +8,7 @@ of the snapshot that no snapshot patch depends on. Their causal past is the
 snapshot's (`heads_keep_past`), so the proposal depends on exactly what its
 author saw while naming only the heads, not every patch of the channel.
 -/
-namespace o5s_kernel.Heads
+namespace o1s_kernel.Heads
 open Causality
 
 /-- `v` is a dependency of a patch in `ms`. -/
@@ -245,4 +245,4 @@ theorem heads_keep_past (rows : Rows) (members : alloc.vec.Vec Usize)
   rintro hs ⟨hsub, hmem⟩
   exact ⟨hsub, fun x hx => ((hmem x).1 hx).2, keep_past rows dag members.val hs.val hmem⟩
 
-end o5s_kernel.Heads
+end o1s_kernel.Heads

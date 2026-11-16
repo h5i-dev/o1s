@@ -1,7 +1,7 @@
 import Indexed
 import Projection
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Boundary
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Boundary
 open Indexed
 
 def alive (live : List Bool) (v : Usize) : Bool := live[v.val]?.getD false
@@ -92,4 +92,4 @@ theorem boundary_segment (rows : alloc.vec.Vec (alloc.vec.Vec Usize))
   rw [h.2.1 v, row_segment edges (fun u => alive live.val u = true) rows.val seeds.val source seed_eq row_eq]
   exact and_comm
 
-end o5s_kernel.Boundary
+end o1s_kernel.Boundary

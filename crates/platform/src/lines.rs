@@ -43,7 +43,7 @@ impl LineVersion {
         // edits next to each other; any order of equal keys gives the same
         // answer, this one just keeps the output deterministic.
         all.sort_by(|a, b| (a.start, a.end, &a.content).cmp(&(b.start, b.end, &b.content)));
-        let kept = o5s_kernel::lines::merge(&ranges(all.iter().copied()))?;
+        let kept = o1s_kernel::lines::merge(&ranges(all.iter().copied()))?;
         Some(Self {
             base: first.base,
             original: first.original.clone(),
@@ -51,7 +51,7 @@ impl LineVersion {
         })
     }
 }
-fn ranges<'a>(edits: impl Iterator<Item = &'a LineEdit>) -> Vec<o5s_kernel::lines::Range> {
+fn ranges<'a>(edits: impl Iterator<Item = &'a LineEdit>) -> Vec<o1s_kernel::lines::Range> {
     edits
         .map(|e| (e.start, e.end, e.content.as_bytes().to_vec()))
         .collect()
@@ -62,7 +62,7 @@ fn ranges<'a>(edits: impl Iterator<Item = &'a LineEdit>) -> Vec<o5s_kernel::line
 fn render(original: &str, changes: &[LineEdit]) -> Result<String, Refusal> {
     let all: Vec<usize> = (0..changes.len()).collect();
     let bytes =
-        o5s_kernel::lines::render(&original.as_bytes().to_vec(), &ranges(changes.iter()), &all)
+        o1s_kernel::lines::render(&original.as_bytes().to_vec(), &ranges(changes.iter()), &all)
             .ok_or_else(|| refuse("invalid line range, or materialization capacity exceeded"))?;
     String::from_utf8(bytes).map_err(|_| refuse("invalid UTF-8 materialization"))
 }
@@ -121,7 +121,7 @@ impl Repository {
         while i < changes.len() {
             let end = i + changes[i..].partition_point(|e| e.path == changes[i].path);
             let group = &changes[i..end];
-            if !o5s_kernel::lines::ranges_valid(&ranges(group.iter())) {
+            if !o1s_kernel::lines::ranges_valid(&ranges(group.iter())) {
                 return Err(refuse("overlapping line edits"));
             }
             let version = self.line_version(&group[0].path, group)?;
@@ -168,7 +168,7 @@ impl Repository {
                 .collect();
             let base = changes.iter().find(|e| e.path == edit.path).unwrap().base;
             let (sole, m) =
-                o5s_kernel::causality::sole_head(&rows, &edits, &roots, base as usize, marks);
+                o1s_kernel::causality::sole_head(&rows, &edits, &roots, base as usize, marks);
             marks = m;
             if !sole {
                 return Err(refuse(

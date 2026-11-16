@@ -70,7 +70,7 @@ impl Projection {
             }
             work.rebuilt_sources += 1;
             let index = self.indices[&source];
-            let search = o5s_kernel::indexed::reachable(
+            let search = o1s_kernel::indexed::reachable(
                 &self.dead_rows,
                 &self.original_rows[index],
                 std::mem::take(&mut self.marks),
@@ -81,7 +81,7 @@ impl Projection {
                     .iter()
                     .map(|i| self.dead_rows[*i].len())
                     .sum::<usize>();
-            let boundary = o5s_kernel::indexed::keep_live(&search.queue, &self.alive)
+            let boundary = o1s_kernel::indexed::keep_live(&search.queue, &self.alive)
                 .into_iter()
                 .map(|i| self.ids[i])
                 .collect();
@@ -106,7 +106,7 @@ impl Projection {
     }
     fn affected_component(&mut self, touched: BTreeSet<u64>) -> BTreeSet<u64> {
         let seeds = touched.iter().map(|id| self.indices[id]).collect();
-        let search = o5s_kernel::indexed::reachable(
+        let search = o1s_kernel::indexed::reachable(
             &self.weak_rows,
             &seeds,
             std::mem::take(&mut self.marks),
@@ -163,7 +163,7 @@ mod tests {
                 let seeds = (0..3)
                     .filter(|id| seed_mask & (1 << id) != 0)
                     .collect::<Vec<_>>();
-                let expected = o5s_kernel::graph::weak_component(&edges, &seeds)
+                let expected = o1s_kernel::graph::weak_component(&edges, &seeds)
                     .into_iter()
                     .collect::<BTreeSet<_>>();
                 assert_eq!(
@@ -183,7 +183,7 @@ mod tests {
             edges.push(pair);
             projection.apply(&[], &[pair]);
             for id in ids {
-                let expected = o5s_kernel::graph::weak_component(&edges, &vec![id]);
+                let expected = o1s_kernel::graph::weak_component(&edges, &vec![id]);
                 assert_eq!(
                     projection.affected_component(BTreeSet::from([id])),
                     expected.into_iter().collect(),

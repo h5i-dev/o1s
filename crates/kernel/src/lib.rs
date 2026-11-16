@@ -1,4 +1,4 @@
-//! Verified pure kernels for o5s patch admission, graph projection and byte rendering.
+//! Verified pure kernels for o1s patch admission, graph projection and byte rendering.
 //!
 //! Charon and Aeneas extract the admission, graph traversal, interval and
 //! line-coordinate functions called by the application into Lean 4. Their

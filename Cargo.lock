@@ -1264,13 +1264,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-cli"
+name = "o1s-cli"
 version = "0.1.0"
 dependencies = [
  "axum",
  "clap",
  "fs2",
- "o5s-server",
+ "o1s-server",
  "reqwest",
  "serde",
  "serde_json",
@@ -1279,7 +1279,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-gitpush"
+name = "o1s-gitpush"
 version = "0.1.0"
 dependencies = [
  "miniz_oxide",
@@ -1288,7 +1288,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-kernel"
+name = "o1s-kernel"
 version = "0.1.0"
 dependencies = [
  "h5i-app-std",
@@ -1296,18 +1296,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-load"
+name = "o1s-load"
 version = "0.1.0"
 dependencies = [
  "futures",
- "o5s-server",
+ "o1s-server",
  "reqwest",
  "serde_json",
  "tokio",
 ]
 
 [[package]]
-name = "o5s-pgwire"
+name = "o1s-pgwire"
 version = "0.1.0"
 dependencies = [
  "async-lock",
@@ -1315,8 +1315,8 @@ dependencies = [
  "futures",
  "h5i-app-pgsql",
  "h5i-app-sql",
- "o5s-platform",
- "o5s-registry",
+ "o1s-platform",
+ "o1s-registry",
  "serde",
  "serde_json",
  "sha2",
@@ -1325,29 +1325,29 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-platform"
+name = "o1s-platform"
 version = "0.1.0"
 dependencies = [
- "o5s-kernel",
- "o5s-registry",
+ "o1s-kernel",
+ "o1s-registry",
  "serde",
  "serde_json",
  "sha2",
 ]
 
 [[package]]
-name = "o5s-registry"
+name = "o1s-registry"
 version = "0.1.0"
 dependencies = [
  "h5i-app-schema",
  "h5i-app-sql",
  "h5i-app-std",
- "o5s-kernel",
+ "o1s-kernel",
  "serde",
 ]
 
 [[package]]
-name = "o5s-server"
+name = "o1s-server"
 version = "0.1.0"
 dependencies = [
  "axum",
@@ -1359,10 +1359,10 @@ dependencies = [
  "h5i-app-token",
  "http-body-util",
  "libcrux-hmac",
- "o5s-gitpush",
- "o5s-pgwire",
- "o5s-platform",
- "o5s-registry",
+ "o1s-gitpush",
+ "o1s-pgwire",
+ "o1s-platform",
+ "o1s-registry",
  "serde",
  "serde_json",
  "sha2",
@@ -1373,7 +1373,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "o5s-worker"
+name = "o1s-worker"
 version = "0.1.0"
 dependencies = [
  "axum",
@@ -1381,10 +1381,10 @@ dependencies = [
  "h5i-app-token",
  "js-sys",
  "libcrux-hmac",
- "o5s-gitpush",
- "o5s-pgwire",
- "o5s-platform",
- "o5s-registry",
+ "o1s-gitpush",
+ "o1s-pgwire",
+ "o1s-platform",
+ "o1s-registry",
  "serde",
  "serde_json",
  "tokio-postgres",

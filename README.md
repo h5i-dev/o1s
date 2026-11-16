@@ -1,9 +1,9 @@
-# o5s: Verified Version Control for Agent Swarms
+# o1s: Verified Version Control for Agent Swarms
 
-<a href="https://github.com/h5i-dev/o5s/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/h5i-dev/o5s/actions/workflows/ci.yml/badge.svg"></a>
-<a href="https://github.com/h5i-dev/o5s/blob/main/LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/h5i-dev/o5s?color=blue"></a>
+<a href="https://github.com/h5i-dev/o1s/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/h5i-dev/o1s/actions/workflows/ci.yml/badge.svg"></a>
+<a href="https://github.com/h5i-dev/o1s/blob/main/LICENSE"><img alt="Apache-2.0" src="https://img.shields.io/github/license/h5i-dev/o1s?color=blue"></a>
 
-**o5s** is a patch-based collaboration server for AI agents and people who change the same code at the same time. Its core is formally verified in Lean 4 against the Rust code that runs.
+**o1s** is a patch-based collaboration server for AI agents and people who change the same code at the same time. Its core is formally verified in Lean 4 against the Rust code that runs.
 
 - **No rebase loop:** non-conflicting patches merge in any order, with the same result.
 - **Line-level merging:** agents editing different lines of one file both get in.
@@ -15,12 +15,12 @@
 
 ```bash
 ./scripts/dev.sh                              # Start a local server; prints three tokens
-cd my-project && o5s connect demo             # Attach an ordinary Git repository
-o5s propose --intent 'Add the parser'         # Propose your working-tree changes
-o5s --profile reviewer approve 1              # An independent reviewer approves
-o5s --profile checks check 1 --pass           # An independent check passes
-o5s --profile reviewer merge 1                # Admit it to the main channel
-o5s fetch                                     # Fetch the admitted snapshot (refs/o5s/main)
+cd my-project && o1s connect demo             # Attach an ordinary Git repository
+o1s propose --intent 'Add the parser'         # Propose your working-tree changes
+o1s --profile reviewer approve 1              # An independent reviewer approves
+o1s --profile checks check 1 --pass           # An independent check passes
+o1s --profile reviewer merge 1                # Admit it to the main channel
+o1s fetch                                     # Fetch the admitted snapshot (refs/o1s/main)
 ```
 
 ---
@@ -30,11 +30,11 @@ o5s fetch                                     # Fetch the admitted snapshot (ref
 Needs Rust stable, Git and Python 3.
 
 ```bash
-./scripts/dev.sh                              # Local write-ahead log in .o5s/
+./scripts/dev.sh                              # Local write-ahead log in .o1s/
 ./scripts/dev.sh --postgres                   # Or PostgreSQL 17 in Docker
 python3 scripts/demo.py                       # Conflict → resolution → convergence → Git export
 cargo install --path crates/cli --locked      # The agent CLI
-o5s login                                     # Paste the author token (reviewer: --profile reviewer)
+o1s login                                     # Paste the author token (reviewer: --profile reviewer)
 ```
 
 Web UI: **http://127.0.0.1:3000/#/repos** (paste a printed token).
@@ -47,11 +47,11 @@ Web UI: **http://127.0.0.1:3000/#/repos** (paste a printed token).
 flowchart LR
     A[Agents, reviewers and web UI] --> L[Local server: axum API]
     A --> W[Cloudflare Worker: same API]
-    L --> K[Verified registry kernel: o5s_registry::transition]
+    L --> K[Verified registry kernel: o1s_registry::transition]
     W --> K
     P[Lean 4 proofs] -. about the extracted Rust .-> K
     K --> S[Local write-ahead log]
-    K --> Q[PostgreSQL via o5s_pgwire, Hyperdrive on Workers]
+    K --> Q[PostgreSQL via o1s_pgwire, Hyperdrive on Workers]
     L --> V[Causal file view and explicit conflicts]
     W --> V
     V --> E[Bare Git export and workspaces]
@@ -66,7 +66,7 @@ Details: [architecture](docs/architecture.md) · [patch model](docs/patch-model.
 
 1,000 agents, at most 64 in flight, one host, final contents checked.
 
-| Workload | Git integrated | Git /s | o5s integrated | o5s /s |
+| Workload | Git integrated | Git /s | o1s integrated | o1s /s |
 |---|---:|---:|---:|---:|
 | Different lines of one file | 431 (569 hit rebase conflicts) | 9.8 | 1,000 | 574 |
 | One new file each | 1,000 | 9.0 | 1,000 | 1,083 |
@@ -99,13 +99,13 @@ Full list and scope: [proofs](docs/proofs.md).
 
 | Backend | Use | Set |
 |---|---|---|
-| Local log | One server, development | default (`O5S_DATA`) |
-| PostgreSQL | Several replicas, one database | `O5S_DATABASE_URL` |
+| Local log | One server, development | default (`O1S_DATA`) |
+| PostgreSQL | Several replicas, one database | `O1S_DATABASE_URL` |
 | Cloudflare Workers | Hosted, Git in Artifacts | [`crates/worker`](crates/worker/README.md) |
 
 ```bash
 ./scripts/verify.sh                           # Format, tests, UI and Worker checks, both Lean projects
-export O5S_TEST_DATABASE_URL=$(scripts/postgres.sh)  # Then verify.sh includes PostgreSQL
+export O1S_TEST_DATABASE_URL=$(scripts/postgres.sh)  # Then verify.sh includes PostgreSQL
 h5i app mutate . --only merge_                # Inject bugs the proofs must reject
 ```
 
@@ -113,7 +113,7 @@ h5i app mutate . --only merge_                # Inject bugs the proofs must reje
 
 ## 6. Documentation
 
-- [CLI manual](docs/cli.md) · [short paper](https://github.com/h5i-dev/o5s/blob/main/docs/o5s-short-paper.pdf)
+- [CLI manual](docs/cli.md) · [short paper](https://github.com/h5i-dev/o1s/blob/main/docs/o1s-short-paper.pdf)
 - [Architecture](docs/architecture.md) · [patch model](docs/patch-model.md)
 - [Access control](docs/access.md) · [storage](docs/storage.md) · [load testing](docs/load-testing.md)
 - [Proofs](docs/proofs.md) · [status](docs/status.md) · [roadmap](docs/roadmap.md)

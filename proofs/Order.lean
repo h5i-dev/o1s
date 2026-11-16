@@ -1,7 +1,7 @@
 import Constructor
 
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Order
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Order
 attribute [local instance] Classical.propDecidable
 
 /-- An emitted vertex has no predecessor still in the remaining work set. -/
@@ -118,4 +118,4 @@ theorem frontier_counts_exact (edges : List (Usize × Usize))
   · intro hv
     exact ⟨hv.1, (counts vertex hv.1).2 hv.2⟩
 
-end o5s_kernel.Order
+end o1s_kernel.Order

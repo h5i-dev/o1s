@@ -7,9 +7,9 @@ import Writes
 successful command keeps it, about the model; `inv_preserved` transfers that
 to the extracted `transition`.
 -/
-open Aeneas Aeneas.Std Result o5s_registry o5s_registry.Spec o5s_registry.Writes H5iAppLib
+open Aeneas Aeneas.Std Result o1s_registry o1s_registry.Spec o1s_registry.Writes H5iAppLib
 
-namespace o5s_registry.Invariant
+namespace o1s_registry.Invariant
 
 def hasPatch (s : St) (id : U64) : Prop := ∃ p ∈ s.patches, p.id = id
 
@@ -1004,4 +1004,4 @@ theorem members_append_only (a : Principal) (s : Snapshot) (c : Command) (ws : a
     subst this
     rw [← e.2] at hp; omega
 
-end o5s_registry.Invariant
+end o1s_registry.Invariant

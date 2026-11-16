@@ -4,7 +4,7 @@ use axum::{
     http::HeaderMap,
     response::Response,
 };
-use o5s_platform::Refusal;
+use o1s_platform::Refusal;
 use serde::Deserialize;
 use std::ops::Bound::{Excluded, Unbounded};
 

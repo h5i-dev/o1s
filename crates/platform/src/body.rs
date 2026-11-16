@@ -4,11 +4,11 @@
 use crate::{Edit, Refusal, Repository, documents::GraphEdit, lines::LineEdit, refuse};
 use sha2::{Digest, Sha256};
 
-const FILES: &str = "o5s-patch-v1";
-const LINES: &str = "o5s-line-patch-v1";
-const GRAPH: &str = "o5s-graph-patch-v1";
+const FILES: &str = "o1s-patch-v1";
+const LINES: &str = "o1s-line-patch-v1";
+const GRAPH: &str = "o1s-graph-patch-v1";
 /// Graph edits and whole-file edits in one patch.
-const MIXED: &str = "o5s-mixed-patch-v1";
+const MIXED: &str = "o1s-mixed-patch-v1";
 
 /// Lowercase hexadecimal SHA-256.
 pub fn hash(body: &[u8]) -> String {

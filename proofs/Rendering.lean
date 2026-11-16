@@ -1,6 +1,6 @@
 import Interval
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
-namespace o5s_kernel.Rendering
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
+namespace o1s_kernel.Rendering
 abbrev Chunk := Usize × Usize × alloc.vec.Vec U8
 
 def weight (chunks : List Chunk) : Nat := (chunks.map fun c => c.2.2.val.length).sum
@@ -77,4 +77,4 @@ theorem finish (bytes accum : List U8) (cursor : Nat) (state : List U8 × Nat)
   apply finish
   assumption
 
-end o5s_kernel.Rendering
+end o1s_kernel.Rendering

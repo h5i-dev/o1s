@@ -21,7 +21,7 @@
     "transport": "file://",
     "unintegrated_conflicts": 569
   },
-  "o5s": {
+  "o1s": {
     "approve_and_check": {
       "failed": 0,
       "max_ms": 142.692441,
@@ -59,7 +59,7 @@
       "requests": 1000,
       "seconds": 1.230210846
     },
-    "system": "o5s",
+    "system": "o1s",
     "transport": "HTTP over loopback"
   },
   "settings": {

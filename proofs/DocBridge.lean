@@ -1,7 +1,7 @@
 import DocMatKernel
 import DocMatModel
 import DocView
-open Aeneas Aeneas.Std Result H5iAppLib o5s_kernel
+open Aeneas Aeneas.Std Result H5iAppLib o1s_kernel
 /-!
 # The kernel's boundary graph is the model's
 
@@ -12,7 +12,7 @@ with `Live` by anchor index (`liveL_iff`), and the boundary rows
 So the model's depth and blocking satisfy the Kahn axioms for the graph the
 extracted code builds.
 -/
-namespace o5s_kernel.DocBridge
+namespace o1s_kernel.DocBridge
 open DocModel Document DocRep DocKernel DocKahn DocMatModel DocView
 
 variable {d : document.Doc} {H : Hist}
@@ -179,4 +179,4 @@ theorem bridge (hr : Rep d H) (hb : Built H) (wf : DocWF d) (bnd : List (alloc.v
     have hm := live_mem hx
     exact ⟨aIdx H x, by rw [hat]; exact idx_lt hm, anc_aIdx hm⟩
 
-end o5s_kernel.DocBridge
+end o1s_kernel.DocBridge

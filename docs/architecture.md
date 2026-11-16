@@ -4,11 +4,11 @@
 flowchart LR
     A[Agents, reviewers and web UI] --> L[Local server: axum API]
     A --> W[Cloudflare Worker: same API]
-    L --> K[Verified registry kernel: o5s_registry::transition]
+    L --> K[Verified registry kernel: o1s_registry::transition]
     W --> K
     P[Lean 4 proofs] -. about the extracted Rust .-> K
     K --> S[Local write-ahead log]
-    K --> Q[PostgreSQL via o5s_pgwire, Hyperdrive on Workers]
+    K --> Q[PostgreSQL via o1s_pgwire, Hyperdrive on Workers]
     L --> V[Causal file view and explicit conflicts]
     W --> V
     V --> E[Bare Git export and workspaces]
@@ -26,14 +26,14 @@ The local UI and API work without Cloudflare. On Cloudflare, the Rust Worker in 
 - Resolution: a patch depending on all competing heads. Existing conflicts can be integrated as data; export requires a conflict-free view.
 - Worktree: detached Git worktree of an exported bare projection. Each authenticated agent has a separate server-side snapshot workspace. Client worktrees use ordinary Git commands. Repeated requests reuse that agent’s workspace and preserve local changes. Workspace import records staged/unstaged text changes, additions and deletions as an immutable proposal depending on the exact exported snapshot. The index and working files stay intact. Sandbox execution remains future work.
 
-Every committed registry decision comes from the extracted `o5s_registry::transition`, on either backend: the local write-ahead log or PostgreSQL, one READ COMMITTED transaction per command under its repository's advisory lock. See [storage and transactions](storage.md). Materialization caches per-path causal heads and inspects newly appended channel membership. Dependency searches stop when the relevant existing heads are found. A compact `/api/view` endpoint omits the patch registry. The admin `/api/state` response still includes it, so UI payload size remains proportional to history. See [scaling](scaling.md) for measured work and worst cases. Channel forks copy their membership rows; they are not constant-cost forks.
+Every committed registry decision comes from the extracted `o1s_registry::transition`, on either backend: the local write-ahead log or PostgreSQL, one READ COMMITTED transaction per command under its repository's advisory lock. See [storage and transactions](storage.md). Materialization caches per-path causal heads and inspects newly appended channel membership. Dependency searches stop when the relevant existing heads are found. A compact `/api/view` endpoint omits the patch registry. The admin `/api/state` response still includes it, so UI payload size remains proportional to history. See [scaling](scaling.md) for measured work and worst cases. Channel forks copy their membership rows; they are not constant-cost forks.
 
 ## References and interpretation
 
 - [Cloudflare competition and Artifacts](https://blog.cloudflare.com/next-git-platform-on-cloudflare/): Git storage/capabilities as infrastructure for agent collaboration.
 - [Artifacts Workers binding](https://developers.cloudflare.com/artifacts/api/workers-binding/): actual adapter contract and disposal rules.
 - [h5i](https://github.com/h5i-dev/h5i): h5i-app extraction, kernels and proof gate.
-- [Pijul FAQ](https://pijul.org/faq) and [Pijul](https://pijul.org/) and [Theory](https://pijul.org/manual/theory): patch identity/dependencies, channels and conflict-preserving collaboration. o5s combines independent causal file registers with immutable-base line intervals, not a reimplementation of libpijul.
+- [Pijul FAQ](https://pijul.org/faq) and [Pijul](https://pijul.org/) and [Theory](https://pijul.org/manual/theory): patch identity/dependencies, channels and conflict-preserving collaboration. o1s combines independent causal file registers with immutable-base line intervals, not a reimplementation of libpijul.
 - [Jujutsu overview](https://www.git-tower.com/blog/jujutsu): stable change identity and operation-oriented work.
 - [Stacked PR preview article](https://itbrief.co.uk/story/github-puts-stacked-pull-requests-into-public-preview): review dependencies are better expressed explicitly.
 - [Review after the pull request](https://www.grahambrooks.com/post/code-review-after-the-pull-request/): intent and continuous review inspire proposal intent/events.

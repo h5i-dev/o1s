@@ -50,39 +50,39 @@ impl Metrics {
     /// Prometheus text exposition, with extra pre-rendered lines appended.
     pub fn render(&self, extra: &str) -> String {
         let mut out = String::from(
-            "# HELP o5s_http_requests_total HTTP requests by route and status.\n# TYPE o5s_http_requests_total counter\n",
+            "# HELP o1s_http_requests_total HTTP requests by route and status.\n# TYPE o1s_http_requests_total counter\n",
         );
         let requests = self.requests.lock().unwrap();
         for ((method, route, status), s) in requests.iter() {
             let _ = writeln!(
                 out,
-                "o5s_http_requests_total{{method=\"{method}\",route=\"{route}\",status=\"{status}\"}} {}",
+                "o1s_http_requests_total{{method=\"{method}\",route=\"{route}\",status=\"{status}\"}} {}",
                 s.count
             );
         }
-        out.push_str("# HELP o5s_http_request_seconds Request latency.\n# TYPE o5s_http_request_seconds histogram\n");
+        out.push_str("# HELP o1s_http_request_seconds Request latency.\n# TYPE o1s_http_request_seconds histogram\n");
         for ((method, route, status), s) in requests.iter() {
             let labels = format!("method=\"{method}\",route=\"{route}\",status=\"{status}\"");
             for (i, bound) in BUCKETS.iter().enumerate() {
                 let _ = writeln!(
                     out,
-                    "o5s_http_request_seconds_bucket{{{labels},le=\"{bound}\"}} {}",
+                    "o1s_http_request_seconds_bucket{{{labels},le=\"{bound}\"}} {}",
                     s.buckets[i]
                 );
             }
             let _ = writeln!(
                 out,
-                "o5s_http_request_seconds_bucket{{{labels},le=\"+Inf\"}} {}",
+                "o1s_http_request_seconds_bucket{{{labels},le=\"+Inf\"}} {}",
                 s.count
             );
             let _ = writeln!(
                 out,
-                "o5s_http_request_seconds_sum{{{labels}}} {}",
+                "o1s_http_request_seconds_sum{{{labels}}} {}",
                 s.seconds
             );
             let _ = writeln!(
                 out,
-                "o5s_http_request_seconds_count{{{labels}}} {}",
+                "o1s_http_request_seconds_count{{{labels}}} {}",
                 s.count
             );
         }

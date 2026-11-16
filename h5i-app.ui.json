@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "title": "o5s",
+  "title": "o1s",
   "description": "Immutable patch collaboration with reviewed admission, conflict preservation, incremental graph summaries and checked text rendering.",
   "author": "Codex (agent-authored explanation; proof results are supplied by h5i-app check)",
   "exclusions": [
@@ -37,7 +37,7 @@
           "digest": "a6e4cdabf4d786f3b8d0de92a48432c925750196698a3489cce0cce051dc5f32"
         }
       ],
-      "symbol": "o5s_kernel.Patch.merge_spec"
+      "symbol": "o1s_kernel.Patch.merge_spec"
     },
     {
       "id": "convergence",
@@ -51,7 +51,7 @@
           "digest": "a6e4cdabf4d786f3b8d0de92a48432c925750196698a3489cce0cce051dc5f32"
         }
       ],
-      "symbol": "o5s_kernel.Patch.successful_orders_converge"
+      "symbol": "o1s_kernel.Patch.successful_orders_converge"
     },
     {
       "id": "traversal",
@@ -78,7 +78,7 @@
           "digest": "2d2008de692c419e20022450ec4298bbd6206edc0ae7be12a86081a700514e18"
         }
       ],
-      "symbol": "o5s_kernel.Indexed.reachable_spec"
+      "symbol": "o1s_kernel.Indexed.reachable_spec"
     },
     {
       "id": "boundary-proof",
@@ -92,7 +92,7 @@
           "digest": "1d5ce168b29ba6b747743e97b0de81f61a04eec05bb12bde8e23d71f9de0571f"
         }
       ],
-      "symbol": "o5s_kernel.Boundary.boundary_segment"
+      "symbol": "o1s_kernel.Boundary.boundary_segment"
     },
     {
       "id": "summary-proof",
@@ -106,7 +106,7 @@
           "digest": "4c20786ef42460b66fca415265fe3b8c6ba7539495194569d63613ca2cc4f545"
         }
       ],
-      "symbol": "o5s_kernel.Projection.live_reachability"
+      "symbol": "o1s_kernel.Projection.live_reachability"
     },
     {
       "id": "renderer",
@@ -133,7 +133,7 @@
           "digest": "1749d2234562dfc344971167131358e4895db6bb1dbaa6be0746c7270afcd49c"
         }
       ],
-      "symbol": "o5s_kernel.Checked.checked_render_spec"
+      "symbol": "o1s_kernel.Checked.checked_render_spec"
     },
     {
       "id": "coordinates-proof",
@@ -147,7 +147,7 @@
           "digest": "f741caff33233e6cd57df5c01a89cdb442c1e03be386f5442bd0eba54ee802b5"
         }
       ],
-      "symbol": "o5s_kernel.Coordinates.line_boundaries_ordered"
+      "symbol": "o1s_kernel.Coordinates.line_boundaries_ordered"
     },
     {
       "id": "adapter",

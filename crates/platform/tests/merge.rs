@@ -1,4 +1,4 @@
-use o5s_platform::*;
+use o1s_platform::*;
 fn actor(user: u64) -> Actor {
     Actor { tenant: 1, user }
 }

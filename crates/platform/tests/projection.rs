@@ -1,4 +1,4 @@
-use o5s_platform::projection::*;
+use o1s_platform::projection::*;
 use std::collections::BTreeSet;
 #[test]
 fn every_three_vertex_graph_and_liveness_preserves_reachability() {
@@ -16,7 +16,7 @@ fn every_three_vertex_graph_and_liveness_preserves_reachability() {
                 .filter(|(_, yes)| *yes)
                 .map(|(v, _)| *v)
                 .collect();
-            let rows = o5s_kernel::graph::summary_rows(&edges, &alive);
+            let rows = o1s_kernel::graph::summary_rows(&edges, &alive);
             let certified: BTreeSet<_> = alive
                 .iter()
                 .zip(rows)
@@ -30,8 +30,8 @@ fn every_three_vertex_graph_and_liveness_preserves_reachability() {
                 if !alive {
                     continue;
                 }
-                let original = o5s_kernel::graph::reachable(&edges, &vec![u]);
-                let projected = o5s_kernel::graph::reachable(&p.summary_edges(), &vec![u]);
+                let original = o1s_kernel::graph::reachable(&edges, &vec![u]);
+                let projected = o1s_kernel::graph::reachable(&p.summary_edges(), &vec![u]);
                 let expected: BTreeSet<_> = original
                     .into_iter()
                     .filter(|v| live & (1 << v) != 0)

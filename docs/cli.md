@@ -1,20 +1,20 @@
 # Git and agent CLI
 
-Install the local CLI with `cargo install --path crates/cli --locked`. Start the server with `./scripts/dev.sh`. The CLI defaults to `http://127.0.0.1:3000`; `--url` or `O5S_URL` selects another origin.
+Install the local CLI with `cargo install --path crates/cli --locked`. Start the server with `./scripts/dev.sh`. The CLI defaults to `http://127.0.0.1:3000`; `--url` or `O1S_URL` selects another origin.
 
-Run `o5s login` and provide the printed development token on stdin. Saved profiles bind their token to the authenticated origin. `--profile author`, `--profile reviewer` and `--profile checks` keep roles separate. `O5S_TOKEN` supplies a token without saving it. Tokens are never CLI arguments or output fields.
+Run `o1s login` and provide the printed development token on stdin. Saved profiles bind their token to the authenticated origin. `--profile author`, `--profile reviewer` and `--profile checks` keep roles separate. `O1S_TOKEN` supplies a token without saving it. Tokens are never CLI arguments or output fields.
 
 ## Existing Git repositories
 
-Use ordinary `git init`, `git clone` and `git worktree add`. Inside that Git repository, `o5s connect demo` attaches collaboration metadata to its common Git directory. Native worktrees share that connection; their checked-out files remain independent. Connecting creates the server-side collaboration record if it does not exist.
+Use ordinary `git init`, `git clone` and `git worktree add`. Inside that Git repository, `o1s connect demo` attaches collaboration metadata to its common Git directory. Native worktrees share that connection; their checked-out files remain independent. Connecting creates the server-side collaboration record if it does not exist.
 
 ```sh
 git init project
 cd project
-o5s connect demo
+o1s connect demo
 printf 'first line\nsecond line\n' > message.txt
-o5s propose --intent 'Add the initial message'
-o5s show 1
+o1s propose --intent 'Add the initial message'
+o1s show 1
 ```
 
 The proposal captures the current files, including staged, unstaged and untracked changes. It does not stage or commit them. After a conflict-free snapshot has been fetched, subsequent proposals infer disjoint line-range changes against the fetched immutable base where possible. Whole-file replacements remain whole-file proposals.
@@ -22,21 +22,21 @@ The proposal captures the current files, including staged, unstaged and untracke
 An author cannot approve their own patch or report its checks. With separately authenticated profiles:
 
 ```sh
-o5s --profile reviewer approve 1
-o5s --profile checks check 1 --pass
-o5s --profile reviewer merge 1
-o5s fetch
+o1s --profile reviewer approve 1
+o1s --profile checks check 1 --pass
+o1s --profile reviewer merge 1
+o1s fetch
 ```
 
 `check` reports a result; it does not run a test command. `merge 2 3 4` admits a batch atomically when reviews, passing checks and prerequisites are present. A missing prerequisite or refused patch leaves the channel unchanged.
 
-`fetch` writes the conflict-free snapshot to `refs/o5s/main`. It preserves HEAD, the index and working files. Inspect it with `git show refs/o5s/main:message.txt` or `git diff HEAD refs/o5s/main`; use normal Git commands when you choose to update your working tree. Conflicts refuse the ref update.
+`fetch` writes the conflict-free snapshot to `refs/o1s/main`. It preserves HEAD, the index and working files. Inspect it with `git show refs/o1s/main:message.txt` or `git diff HEAD refs/o1s/main`; use normal Git commands when you choose to update your working tree. Conflicts refuse the ref update.
 
 ## Conflict and graph operations
 
-`o5s status`, `o5s view` and `o5s log` expose local changes and remote proposals. Whole-file/line conflicts can be resolved with `o5s resolve PATH --content-file FILE --intent 'Explain this resolution'`, or `--delete`. The resolution is another proposal and needs independent review and checks.
+`o1s status`, `o1s view` and `o1s log` expose local changes and remote proposals. Whole-file/line conflicts can be resolved with `o1s resolve PATH --content-file FILE --intent 'Explain this resolution'`, or `--delete`. The resolution is another proposal and needs independent review and checks.
 
-Graph documents use stable node identities rather than byte offsets. Inspect their admitted nodes with `o5s document PATH`. `o5s propose-graph --operations-file edits.json --intent 'Explain the change' --dependencies 1,2` reads a JSON edits array:
+Graph documents use stable node identities rather than byte offsets. Inspect their admitted nodes with `o1s document PATH`. `o1s propose-graph --operations-file edits.json --intent 'Explain the change' --dependencies 1,2` reads a JSON edits array:
 
 ```json
 [
@@ -49,23 +49,23 @@ Graph documents use stable node identities rather than byte offsets. Inspect the
 ]
 ```
 
-Later insertions, deletions, restorations and ordering operations name the exact identities returned by `document`. Concurrent ambiguous orders and delete/insert disagreements remain explicit conflicts. The server refuses whole-file/line changes to graph documents and graph changes to legacy documents until a migration operation is specified. For new repositories, ordinary `o5s propose` initializes graph documents from Git files. It also converts edits to existing graph documents into deletion and insertion operations, preserving unchanged prefix/suffix atom identities and the exact Git snapshot dependencies. Deleting a graph document's file proposes its removal. A new empty file creates an empty graph document. The executable bit is part of each graph edit. Binary files become whole-file edits in the same proposal, even when text files in it are graph documents. Ambiguous graph output is refused. Separate edits inside one document can replace unchanged interior atoms; this is a conservative edit script. See [document operations](patch-model.md) for the wire types and examples.
+Later insertions, deletions, restorations and ordering operations name the exact identities returned by `document`. Concurrent ambiguous orders and delete/insert disagreements remain explicit conflicts. The server refuses whole-file/line changes to graph documents and graph changes to legacy documents until a migration operation is specified. For new repositories, ordinary `o1s propose` initializes graph documents from Git files. It also converts edits to existing graph documents into deletion and insertion operations, preserving unchanged prefix/suffix atom identities and the exact Git snapshot dependencies. Deleting a graph document's file proposes its removal. A new empty file creates an empty graph document. The executable bit is part of each graph edit. Binary files become whole-file edits in the same proposal, even when text files in it are graph documents. Ambiguous graph output is refused. Separate edits inside one document can replace unchanged interior atoms; this is a conservative edit script. See [document operations](patch-model.md) for the wire types and examples.
 
 ## Supported file subset
 
-The CLI accepts regular files, each at most 4 MiB, with a total request limit of 4 MiB. UTF-8 text uses graph or line operations. Other bytes travel as base64 whole-file edits. Mode 100755 is kept and fetched back. Deletion is distinct from an empty file. Symbolic links are proposed with their target and submodules with the commit their gitlink stages; `o5s fetch` writes them back as modes 120000 and 160000. A path that passes through a symlink is refused. A renamed text file (`git mv`, or a new path holding at least half of a removed graph document's lines) is proposed as a move, so the document keeps its atoms and concurrent edits of the old path follow it (`docs/patch-model.md`). Other renames are a removal and an addition, as in Git.
+The CLI accepts regular files, each at most 4 MiB, with a total request limit of 4 MiB. UTF-8 text uses graph or line operations. Other bytes travel as base64 whole-file edits. Mode 100755 is kept and fetched back. Deletion is distinct from an empty file. Symbolic links are proposed with their target and submodules with the commit their gitlink stages; `o1s fetch` writes them back as modes 120000 and 160000. A path that passes through a symlink is refused. A renamed text file (`git mv`, or a new path holding at least half of a removed graph document's lines) is proposed as a move, so the document keeps its atoms and concurrent edits of the old path follow it (`docs/patch-model.md`). Other renames are a removal and an addition, as in Git.
 
 ## Executed checks
 
-`o5s ci --command CMD` executes checks; `o5s check` only reports one. For each proposal without a passing check report that this runner has not run yet, `o5s ci`:
+`o1s ci --command CMD` executes checks; `o1s check` only reports one. For each proposal without a passing check report that this runner has not run yet, `o1s ci`:
 
 1. Fetches the snapshot the proposal defines, which is the proposal and its causal past (`GET /api/snapshot`). It is immutable, so a later admission elsewhere cannot make the result stale.
 2. Writes the snapshot into a fresh temporary directory, with modes, links and submodules (as empty directories). It refuses any path that would be written through a symlink.
-3. Runs `sh -c CMD` there with `O5S_SNAPSHOT` set, killing it after `--timeout` seconds (default 1,800).
+3. Runs `sh -c CMD` there with `O1S_SNAPSHOT` set, killing it after `--timeout` seconds (default 1,800).
 4. Reports pass or fail as an independent check.
 
-Run it under a check reporter's profile. The kernel refuses a check report from the proposal's author. `--patch N` runs one proposal. Runs are recorded in `.git/o5s/ci.json`, so a crash does not repeat finished work.
+Run it under a check reporter's profile. The kernel refuses a check report from the proposal's author. `--patch N` runs one proposal. Runs are recorded in `.git/o1s/ci.json`, so a crash does not repeat finished work.
 
 The client locks connection metadata across commands and writes fetched refs with compare-and-swap. Saved credentials use an atomic file replacement with mode `0600` on Unix. A connected repository cannot be silently rebound to a different tenant or collaboration repository.
 
-The integration tests launch the actual CLI against a live Axum listener and real Git repositories. They cover native worktrees, concurrent line changes, graph conflicts and reviewed order resolution, ref/HEAD/index preservation, native graph proposals from older snapshots, binary and executable files, symlinks and submodules, empty and removed graph documents, executed checks and origin/tenant separation. Run `cargo test -p o5s-cli`.
+The integration tests launch the actual CLI against a live Axum listener and real Git repositories. They cover native worktrees, concurrent line changes, graph conflicts and reviewed order resolution, ref/HEAD/index preservation, native graph proposals from older snapshots, binary and executable files, symlinks and submodules, empty and removed graph documents, executed checks and origin/tenant separation. Run `cargo test -p o1s-cli`.

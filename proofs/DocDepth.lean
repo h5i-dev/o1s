@@ -1,5 +1,5 @@
 import DocModel
-open o5s_kernel
+open o1s_kernel
 /-!
 # Kahn depth, one step at a time
 
@@ -9,7 +9,7 @@ unblocked live atom has depth `0` exactly when nothing precedes it, and depth
 `r`. Blocking is inherited along `Sum` and is absent when every predecessor is
 unblocked.
 -/
-namespace o5s_kernel.DocDepth
+namespace o1s_kernel.DocDepth
 open DocModel
 
 variable {H : Hist}
@@ -80,4 +80,4 @@ theorem depth_succ_iff {v : Anchor} {r : Nat} (hv : Live H v) (hb : ¬ Blocked H
       omega
     · omega
 
-end o5s_kernel.DocDepth
+end o1s_kernel.DocDepth

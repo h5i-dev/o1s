@@ -1,6 +1,6 @@
 [package]
-name = "o5s-registry"
-description = "Verified transactional patch registry kernel for o5s"
+name = "o1s-registry"
+description = "Verified transactional patch registry kernel for o1s"
 edition = "2024"
 license = "Apache-2.0"
 version = "0.1.0"
@@ -11,7 +11,7 @@ publish = false
 h5i-app-schema = "0.1.1"
 h5i-app-sql = "0.1.1"
 h5i-app-std = "0.1.1"
-o5s-kernel = { path = "../kernel" }
+o1s-kernel = { path = "../kernel" }
 serde = { version = "1", features = ["derive"], optional = true }
 
 [features]

@@ -19,7 +19,7 @@ Results:
 - `merge_order_independent`: any two sorted arrangements of the same set of
   ranges give the same answer and the same kept list.
 -/
-namespace o5s_kernel.LinesModel
+namespace o1s_kernel.LinesModel
 
 variable {α : Type} [DecidableEq α] [Inhabited α]
 set_option linter.unusedSectionVars false
@@ -378,4 +378,4 @@ theorem merge_order_independent (rs₁ rs₂ : List (R α)) (s₁ : Sorted rs₁
   intro x
   rw [(merge_ok rs₁ s₁ h).2.2.1, (merge_ok rs₂ s₂ h₂).2.2.1, same]
 
-end o5s_kernel.LinesModel
+end o1s_kernel.LinesModel

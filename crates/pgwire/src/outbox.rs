@@ -23,7 +23,7 @@ pub struct Pending {
     pub generation: u64,
 }
 
-pub const DDL: &str = "CREATE TABLE IF NOT EXISTS o5s_export_pending (
+pub const DDL: &str = "CREATE TABLE IF NOT EXISTS o1s_export_pending (
   org BIGINT NOT NULL,
   repo TEXT NOT NULL,
   channel TEXT NOT NULL,
@@ -33,9 +33,9 @@ pub const DDL: &str = "CREATE TABLE IF NOT EXISTS o5s_export_pending (
 )";
 
 /// The statement an admission adds to its transaction (search path set).
-pub(crate) const RECORD: &str = "INSERT INTO o5s_export_pending (org, repo, channel, generation, user_id) \
+pub(crate) const RECORD: &str = "INSERT INTO o1s_export_pending (org, repo, channel, generation, user_id) \
      VALUES ($1, $2, $3, $4, $5) ON CONFLICT (org, repo, channel) DO UPDATE SET \
-     generation = GREATEST(o5s_export_pending.generation, EXCLUDED.generation), user_id = EXCLUDED.user_id";
+     generation = GREATEST(o1s_export_pending.generation, EXCLUDED.generation), user_id = EXCLUDED.user_id";
 
 fn signed(n: u64) -> Result<i64, DbError> {
     i64::try_from(n).map_err(|_| DbError::Decode(format!("{n} out of range")))
@@ -56,7 +56,7 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
         let rows = c
             .query_typed(
                 &format!(
-                    "SELECT org, repo, channel, generation, user_id FROM {schema}.o5s_export_pending \
+                    "SELECT org, repo, channel, generation, user_id FROM {schema}.o1s_export_pending \
                      ORDER BY generation LIMIT $1"
                 ),
                 &[(&limit, Type::INT8)],
@@ -85,7 +85,7 @@ impl<C: Connector, R: Runtime> Engine<C, R> {
         let c: &Client = lease.client();
         c.query_typed(
             &format!(
-                "DELETE FROM {schema}.o5s_export_pending \
+                "DELETE FROM {schema}.o1s_export_pending \
                  WHERE org = $1 AND repo = $2 AND channel = $3 AND generation <= $4"
             ),
             &[
